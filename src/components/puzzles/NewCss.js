@@ -124,79 +124,13 @@ export default function NewCss({ state, onChange }) {
   );
 }
 
-function validateSolution(inputValue, solutionValue, bannedValue) {
-  let { input, inputError } = parseInput(inputValue);
-  let { solution, solutionError } = parseSolution(solutionValue);
-  let { banned, bannedError } = parseBanned(bannedValue);
-  let lines = [];
-  let expected = [];
+function MarkupRenderer({ input, solution }) {
+  const container = document.createElement('div');
+  container.innerHTML = input;
 
-  // check solution for banned characters
-  if (!solutionError && !bannedError && banned.length > 0) {
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-    const escapeSymbolsRegex = /[.*+?^${}()|[\]\\]/g;
-    const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
-    if (new RegExp(`(${chars})`, 'i').test(solution)) {
-      solutionError = 'Solution can not contain banned characters';
-    }
-  }
+  const lines = nodesToLines(Array.from(container.children));
+  const selected = solution ? Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']) : [];
 
-  // parse input to lines
-  if (!inputError) {
-    const container = document.createElement('div');
-    container.innerHTML = input;
-    lines = nodesToLines(Array.from(container.childNodes), { qdIdCounter: 0 }, 0);
-
-    // apply solution
-    if (!solutionError) {
-      try {
-        expected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
-        if (expected.length < 1) {
-          solutionError = 'Given solution does not query any node from the input';
-        }
-      } catch (error) {
-        console.log('Failed to run solution', error);
-        solutionError = 'Can not querySelectorAll the given solution';
-      }
-    }
-  }
-
-  return { lines, expected, inputError, solutionError, bannedError };
-}
-
-function parseInput(inputValue) {
-  if (!inputValue) {
-    return { input: inputValue, inputError: 'Input can not be empty' };
-  }
-
-  return { input: inputValue, inputError: '' };
-}
-
-function parseSolution(solutionValue) {
-  if (!solutionValue) {
-    return { solution: solutionValue, solutionError: 'Solution can not be empty' };
-  }
-
-  return { solution: solutionValue, solutionError: '' };
-}
-
-function parseBanned(bannedValue) {
-  try {
-    const banned = JSON.parse(bannedValue);
-    if (!Array.isArray(banned)) {
-      return { banned, bannedError: 'Banned characters must be an array. Example: [".", "#", "d"]' };
-    }
-    if (banned.some((char) => !char || typeof char !== 'string')) {
-      return { banned, bannedError: 'Banned characters must be non-empty strings. Example: [".", "#", "d"]' };
-    }
-    return { banned, bannedError: '' };
-  } catch(error) {
-    console.log('Failed to parse `Banned characters`', error);
-    return { banned: [], bannedError: 'Invalid JSON. Example: [".", "#", "d"]' };
-  }
-}
-
-function MarkupRenderer({ lines, expected }) {
   return (
     <pre class={style.expected}>
       {lines.map((line, index) => {
