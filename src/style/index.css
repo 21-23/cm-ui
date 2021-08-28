@@ -1,3 +1,5 @@
+/* YOLO: on */
+
 html, body {
 	height: 100%;
 	width: 100%;
@@ -15,6 +17,29 @@ html, body {
 	box-sizing: border-box;
 }
 
+header {
+	min-height: 2em;
+	border-bottom: 1px solid #442342;
+	display: flex;
+	align-items: center;
+	padding: 0 1em;
+}
+
 #app {
 	height: 100%;
+}
+
+button {
+	padding: .3em 1em;
+	background: transparent;
+	border: 1px solid #333;
+	cursor: pointer;
+	transition: background 100ms;
+}
+button:hover {
+	background: #ffedfe;
+}
+button.-active {
+	background: #864e83;
+	color: #fff;
 }
