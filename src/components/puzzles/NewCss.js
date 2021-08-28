@@ -55,7 +55,15 @@ function MarkupRenderer({ input, solution }) {
   container.innerHTML = input;
 
   const lines = nodesToLines(Array.from(container.children));
-  const selected = solution ? Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']) : [];
+
+  let selected = [];
+  if (solution) {
+    try {
+      selected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
+    } catch (error) {
+      console.log('Failed to run solution', error);
+    }
+  }
 
   return (
     <pre>
