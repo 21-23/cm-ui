@@ -4,11 +4,6 @@ import { h } from 'preact';
 
 import style from './NewCss.css';
 
-// TODO:
-// self-closing tags, e.g. <br></br> === <br /><br />
-// validation (banned char, solution+input change)
-// expected = solution(input)  -->> move to state as `expected`
-
 export default function NewCss({ state, onChange }) {
   function onNameChange(event) {
     onChange({ ...state, name: event.target.value });
@@ -60,15 +55,7 @@ function MarkupRenderer({ input, solution }) {
   container.innerHTML = input;
 
   const lines = nodesToLines(Array.from(container.children));
-
-  let selected = [];
-  if (solution) {
-    try {
-      selected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
-    } catch (error) {
-      console.log('Failed to run solution', error);
-    }
-  }
+  const selected = solution ? Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']) : [];
 
   return (
     <pre>
