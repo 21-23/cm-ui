@@ -5,11 +5,6 @@ import { useState } from 'preact/hooks';
 
 import style from './NewCss.css';
 
-// TODO:
-// self-closing tags, e.g. <br></br> === <br /><br />
-// validation (banned char, solution+input change)
-// expected = solution(input)  -->> move to state as `expected`
-
 export default function NewCss({ state, onChange }) {
   const [lines, setLines] = useState([]);
 
@@ -129,21 +124,56 @@ export default function NewCss({ state, onChange }) {
   );
 }
 
-function MarkupRenderer({ input, solution }) {
-  const container = document.createElement('div');
-  container.innerHTML = input;
-
-  const lines = nodesToLines(Array.from(container.children));
-
-  let selected = [];
-  if (solution) {
-    try {
-      selected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
-    } catch (error) {
-      console.log('Failed to run solution', error);
-    }
+function validateBannedChars(solution, banned) {
+  if (!solution) {
+    return 'Solution can not be empty';
+  }
+  if (banned.length < 1) {
+    return '';
   }
 
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+  const escapeSymbolsRegex = /[.*+?^${}()|[\]\\]/g;
+  const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
+  if (new RegExp(`(${chars})`, 'i').test()) {
+    return 'Solution can not contain banned characters';
+  }
+
+  return '';
+}
+
+function applySolution(input, solution) {
+  let lines = [];
+  let expected = [];
+  let inputError = '';
+  let solutionError = '';
+
+  if (!input) {
+    return { lines, expected, inputError: 'Input can not be empty', solutionError };
+  }
+
+  const container = document.createElement('div');
+  container.innerHTML = input;
+  lines = nodesToLines(Array.from(container.childNodes), { qdIdCounter: 0 }, 0);
+
+  if (!solution) {
+    return { lines, expected, inputError, solutionError: 'Solution can not be empty' };
+  }
+
+  try {
+    expected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
+    if (expected.length < 1) {
+      return { lines, expected, inputError, solutionError: 'Given solution does not query any node from the input' };
+    }
+  } catch (error) {
+    console.log('Failed to run solution', error);
+    return { lines, expected, inputError, solutionError: 'Can not query select' };
+  }
+
+  return { lines, expected, inputError, solutionError };
+}
+
+function MarkupRenderer({ lines, expected }) {
   return (
     <pre class={style.expected}>
       {lines.map((line, index) => {
