@@ -1,89 +1,207 @@
 // YOLO: on
 
 import { h } from 'preact';
+import { useState } from 'preact/hooks';
 
 import style from './NewCss.css';
 
-// TODO:
-// self-closing tags, e.g. <br></br> === <br /><br />
-// validation (banned char, solution+input change)
-// expected = solution(input)  -->> move to state as `expected`
-
 export default function NewCss({ state, onChange }) {
+  const [lines, setLines] = useState([]);
+  const [expected, setExpected] = useState([]);
+
   function onNameChange(event) {
-    onChange({ ...state, name: event.target.value });
+    const { value } = event.target;
+
+    if (!value) {
+      return onChange({ ...state, name: { value, valid: false, message: 'Name can not be empty' } });
+    }
+
+    onChange({ ...state, name: { value, valid: true } });
+  }
+
+  function onDescriptionChange(event) {
+    onChange({ ...state, description: { value: event.target.value, valid: true } });
   }
 
   function onBannedChange(event) {
     const { value } = event.target;
     try {
       const banned = JSON.parse(value);
-      onChange({ ...state, banned });
-    } catch {
-      console.log('Failed to parse `Banned characters`');
+      if (!Array.isArray(banned)) {
+        return onChange({ ...state, banned: { value, valid: false, message: 'Banned characters must be an array. Example: [".", "#", "d"]' } });
+      }
+      if (banned.some((char) => !char || typeof char !== 'string')) {
+        return onChange({ ...state, banned: { value, valid: false, message: 'Banned characters must be non-empty strings. Example: [".", "#", "d"]' } });
+      }
+      const solutionError = validateBannedChars(state?.solution?.value, banned);
+      return onChange({ ...state, banned: { value, valid: true }, solution: { ...state?.solution, valid: !solutionError, message: solutionError }});
+    } catch(error) {
+      console.log('Failed to parse `Banned characters`', error);
+      onChange({ ...state, banned: { value, valid: false, message: 'Invalid JSON. Example: [".", "#", "d"]' } });
     }
   }
 
   function onSolutionChange(event) {
-    onChange({ ...state, solution: event.target.value });
+    const { value } = event.target;
+
+    const { lines, expected, solutionError } = applySolution(state?.input?.value, value);
+    let solutionBannedError = '';
+    try {
+      const banned = JSON.parse(state?.banned?.value);
+      solutionBannedError = validateBannedChars(value, banned || []);
+    } catch {
+      //
+    }
+    const valid = !solutionError && !solutionBannedError;
+
+    setLines(lines);
+    setExpected(expected);
+    onChange({ ...state, expected, solution: { value, valid, message: solutionError || solutionBannedError } });
   }
 
   function onInputChange(event) {
-    onChange({ ...state, input: event.target.value });
+    const { value } = event.target;
+
+    const { lines, expected, inputError, solutionError } = applySolution(value, state?.solution?.value);
+
+    setLines(lines);
+    setExpected(expected);
+    onChange({
+      ...state,
+      expected,
+      input: { value, valid: !inputError, message: inputError },
+      solution: { ...state?.solution, valid: !solutionError, message: solutionError },
+    });
   }
 
   return (
-    <div>
-      <div class={style.name}>
-        <div>Name:</div>
-        <input value={state?.name || ''} onInput={onNameChange} />
+    <div class={style.panels}>
+      <div class={style.inputs}>
+        <div class={style.title}>Puzzle data</div>
+        <div class={style.name}>
+          <div>Name:</div>
+          <input class={state?.name?.valid ? style.inputValid : style.inputInvalid} value={state?.name?.value || ''} onInput={onNameChange} />
+          {state?.name?.message && <div class={style.errorMessage}>{state?.name?.message}</div>}
+        </div>
+        <div class={style.description}>
+          <div>Description:</div>
+          <input value={state?.description?.value || ''} onInput={onDescriptionChange} />
+        </div>
+        <div class={style.banned}>
+          <div>Banned characters (JSON array):</div>
+          <input class={state?.banned?.valid ? style.inputValid : style.inputInvalid} value={state?.banned?.value || ''} onInput={onBannedChange} placeholder={'[",", "+", "d"]'} />
+          {state?.banned?.message && <div class={style.errorMessage}>{state?.banned?.message}</div>}
+        </div>
+        <div class={style.solution}>
+          <div>Solution:</div>
+          <input class={state?.solution?.valid ? style.inputValid : style.inputInvalid} value={state?.solution?.value || ''} onInput={onSolutionChange} />
+          {state?.solution?.message && <div class={style.errorMessage}>{state?.solution?.message}</div>}
+        </div>
+        <div class={style.input}>
+          <div>Input:</div>
+          <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows="5" cols="50" />
+          {state?.input?.message && <div class={style.errorMessage}>{state?.input?.message}</div>}
+          <MarkupRenderer lines={lines} expected={expected} />
+        </div>
       </div>
-      <div class={style.banned}>
-        <div>Banned characters (JSON array):</div>
-        <input value={JSON.stringify(state?.banned || [])} onInput={onBannedChange} placeholder={'[",", "+", "d"]'} />
-      </div>
-      <div class={style.solution}>
-        <div>Solution:</div>
-        <input value={state?.solution || ''} onInput={onSolutionChange} />
-      </div>
-      <div class={style.input}>
-        <div>Input:</div>
-        <textarea value={state?.input || ''} onInput={onInputChange} rows="5" cols="50" />
-        <MarkupRenderer input={state?.input || ''} solution={state?.solution || ''} />
+      <div class={style.examples}>
+      <div class={style.title}>Example</div>
+        <div class={style.name}>
+          <div>Name:</div>
+          <input value="Puzzle name" readonly="readonly" />
+        </div>
+        <div class={style.description}>
+          <div>Description:</div>
+          <input value="Short description" readonly="readonly" />
+        </div>
+        <div class={style.banned}>
+          <div>Banned characters:</div>
+          <input value={'["#", ","]'} readonly="readonly" />
+        </div>
+        <div class={style.solution}>
+          <div>Solution:</div>
+          <input value=".spcl" readonly="readonly" />
+        </div>
+        <div class={style.input}>
+          <div>Input:</div>
+          <textarea value={'<div><span class="spcl">content</span></div>'} readonly="readonly" rows="5" cols="50" />
+        </div>
       </div>
     </div>
   );
 }
 
-function MarkupRenderer({ input, solution }) {
-  const container = document.createElement('div');
-  container.innerHTML = input;
-
-  const lines = nodesToLines(Array.from(container.children));
-
-  let selected = [];
-  if (solution) {
-    try {
-      selected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
-    } catch (error) {
-      console.log('Failed to run solution', error);
-    }
+function validateBannedChars(solution, banned) {
+  if (!solution) {
+    return 'Solution can not be empty';
+  }
+  if (banned.length < 1) {
+    return '';
   }
 
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+  const escapeSymbolsRegex = /[.*+?^${}()|[\]\\]/g;
+  const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
+  if (new RegExp(`(${chars})`, 'i').test()) {
+    return 'Solution can not contain banned characters';
+  }
+
+  return '';
+}
+
+function applySolution(input, solution) {
+  let lines = [];
+  let expected = [];
+  let inputError = '';
+  let solutionError = '';
+
+  if (!input) {
+    return { lines, expected, inputError: 'Input can not be empty', solutionError };
+  }
+
+  const container = document.createElement('div');
+  container.innerHTML = input;
+  lines = nodesToLines(Array.from(container.childNodes), { qdIdCounter: 0 }, 0);
+
+  if (!solution) {
+    return { lines, expected, inputError, solutionError: 'Solution can not be empty' };
+  }
+
+  try {
+    expected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
+    if (expected.length < 1) {
+      return { lines, expected, inputError, solutionError: 'Given solution does not query any node from the input' };
+    }
+  } catch (error) {
+    console.log('Failed to run solution', error);
+    return { lines, expected, inputError, solutionError: 'Can not query select' };
+  }
+
+  return { lines, expected, inputError, solutionError };
+}
+
+function MarkupRenderer({ lines, expected }) {
   return (
-    <pre>
+    <pre class={style.expected}>
       {lines.map((line, index) => {
-        return <Line line={line} key={index} selected={selected.includes(line.qdId)} />
+        return <Line line={line} key={index} selected={expected.includes(line.qdId)} />
       })}
     </pre>
   );
 }
 
 function Line({ line, selected }) {
+  if (line.tagName === '#text') {
+    return <div class={style.line}>
+      <span>{'  '.repeat(line.indent)}</span>
+      {line.tagValue}
+    </div>;
+  }
+
   return <div class={selected ? style.lineSelected : style.line}>
     <span>{'  '.repeat(line.indent)}</span>
     {
-      line.qdId >= 0
+      line.qdId !== '-1'
       ? <span>
           {'<'}
           <span>{line.tagName}</span>
@@ -94,34 +212,45 @@ function Line({ line, selected }) {
             }
             return <span key={name}>{' '}{parts.join('=')}</span>;
           })}
-          {'>'}
+          {line.selfClosing ? ' />' : '>'}
         </span>
       : <span>{'</'}<span>{line.tagName}</span>{'>'}</span>
     }
   </div>
 }
 
-function nodesToLines(nodes, indent = 0) {
+function nodesToLines(nodes, options, indent) {
   const lines = [];
 
-  nodes.forEach((node, index) => {
-    const qdId = `${indent * 50 + index  }`; // we don't expect more than 50 sibling elements
-    lines.push(nodeToLine(node, qdId, indent));
-    node.setAttribute('data-qdid', qdId);
-    if (node.children.length > 0) {
-      lines.push(...nodesToLines(Array.from(node.children), indent + 1));
+  nodes.forEach((node) => {
+    const qdId = `${++options.qdIdCounter}`;
+    const line = nodeToLine(node, qdId, indent);
+    lines.push(line);
+    if (line.tagName === '#text') {
+      return;
     }
-    lines.push(nodeToLine(node, -1, indent));
+    node.setAttribute('data-qdid', qdId);
+    if (node.children.length > 0 || !line.selfClosing) {
+      lines.push(...nodesToLines(Array.from(node.childNodes), options, indent + 1));
+      lines.push(nodeToLine(node, '-1', indent));
+    }
   });
 
   return lines;
 }
 
+// https://www.w3.org/TR/html51/syntax.html#void-elements
+const VOID_ELEMENTS = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
+
 function nodeToLine(node, qdId, indent) {
+  const tagName = node.nodeName.toLowerCase();
+
   return {
     qdId,
-    tagName: node.tagName.toLowerCase(),
+    tagName,
+    tagValue: node.nodeValue,
+    selfClosing: VOID_ELEMENTS.includes(tagName),
     indent,
-    attributes: Array.from(node.attributes).map(({ name, value }) => ({ name, value })),
+    attributes: Array.from(node.attributes || []).map(({ name, value }) => ({ name, value })),
   };
 }

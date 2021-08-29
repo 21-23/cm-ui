@@ -8,6 +8,12 @@
   background: #fde4e4;
 }
 
+.highlight {
+  background: #ddd;
+  padding: 0 .3em;
+  border-radius: 5px;
+}
+
 .errorMessage {
   color: #9b1d1d;
   font-size: 80%;
@@ -21,23 +27,6 @@
 .description {
   display: flex;
   padding: .3em 0;
-}
-
-.banned {
-  display: flex;
-  padding: .3em 0;
-}
-
-.solution {
-  display: flex;
-  padding: .3em 0;
-}
-
-.line {
-
-}
-.lineSelected {
-  background: #8cd28c;
 }
 
 .expected {

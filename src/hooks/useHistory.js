@@ -10,10 +10,10 @@ export default function useHistory() {
     // HashHistory calls `listen` callback with an object `{ action, location }`
     // but preact-router expects `location` right away
     hashHistory.listen = (callback) => {
-			return hashHistoryListen(({ location }) => {
-				return callback(location);
-			});
-		}
+      return hashHistoryListen(({ location }) => {
+        return callback(location);
+      });
+    }
 
     return hashHistory;
   });

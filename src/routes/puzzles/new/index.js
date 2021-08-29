@@ -25,11 +25,11 @@ function GameSelector({ selected, onChange }) {
 
 export default function NewPuzzle() {
 	const [game, setGame] = useState('CSS');
-	const [newPuzzle, setNewPuzzle] = useState({ CSS: null, JS: null, Lodash: null });
+	const [newPuzzle, setNewPuzzle] = useState({CSS: null, JS: null, Lodash: null });
 
 	return (
 		<>
-			<div>
+			<div class={style.title}>
 				NEW PUZZLE
 			</div>
 			<GameSelector selected={game} onChange={(game) => setGame(game)} />
