@@ -1,3 +1,5 @@
+// YOLO: on
+
 import { h } from 'preact';
 import { route } from 'preact-router';
 // import style from './style.css';

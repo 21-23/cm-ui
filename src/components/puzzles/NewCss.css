@@ -1,0 +1,20 @@
+/* YOLO: on */
+
+.name {
+  display: flex;
+}
+
+.banned {
+  display: flex;
+}
+
+.solution {
+  display: flex;
+}
+
+.line {
+
+}
+.lineSelected {
+  background: #ff0;
+}

@@ -1,3 +1,5 @@
+// YOLO: on
+
 import { h } from 'preact';
 import { Router } from 'preact-router';
 // import style from './style.css';
@@ -9,9 +11,9 @@ const Puzzles = () => {
 	return (
 		<div>
       <Router>
-        <PuzzleList path="/puzzles" />
-        <NewPuzzle path="/puzzles/new" />
-      </Router>
+				<PuzzleList path="/puzzles" />
+				<NewPuzzle path="/puzzles/new" />
+			</Router>
 		</div>
 	);
 }
