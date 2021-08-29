@@ -4,6 +4,11 @@ import { h } from 'preact';
 
 import style from './NewCss.css';
 
+// TODO:
+// self-closing tags, e.g. <br></br> === <br /><br />
+// validation (banned char, solution+input change)
+// expected = solution(input)  -->> move to state as `expected`
+
 export default function NewCss({ state, onChange }) {
   function onNameChange(event) {
     onChange({ ...state, name: event.target.value });
