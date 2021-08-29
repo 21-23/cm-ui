@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "build": "preact build --no-prerender",
-    "serve": "sirv build --port 8080 --cors --single",
     "dev": "preact watch",
     "lint": "eslint src",
-    "test": "jest"
+    "test": "jest",
+    "clean:prod": "rm -rf dist-prod",
+    "build:prod": "npm run clean:prod && preact build --no-prerender --dest dist-prod"
   },
   "eslintConfig": {
     "extends": "preact",
