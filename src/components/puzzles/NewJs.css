@@ -49,4 +49,9 @@
 
 .title {
   font-weight: bold;
+  font-size: 1.1em;
+}
+
+.propName {
+  font-weight: bold;
 }

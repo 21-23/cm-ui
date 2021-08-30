@@ -72,26 +72,26 @@ export default function NewCss({ state, onChange }) {
       <div class={style.inputs}>
         <div class={style.title}>Puzzle data</div>
         <div class={style.name}>
-          <div>Name:</div>
+          <div class={style.propName}>Name:</div>
           <input class={state?.name?.valid ? style.inputValid : style.inputInvalid} value={state?.name?.value || ''} onInput={onNameChange} />
           {state?.name?.message && <div class={style.errorMessage}>{state?.name?.message}</div>}
         </div>
         <div class={style.description}>
-          <div>Description:</div>
+          <div class={style.propName}>Description:</div>
           <input value={state?.description?.value || ''} onInput={onDescriptionChange} />
         </div>
         <div class={style.banned}>
-          <div>Banned characters (JSON array):</div>
+          <div><span class={style.propName}>Banned characters</span> (JSON array):</div>
           <input class={state?.banned?.valid ? style.inputValid : style.inputInvalid} value={state?.banned?.value || ''} onInput={onBannedChange} placeholder={'[",", "+", "d"]'} />
           {state?.banned?.message && <div class={style.errorMessage}>{state?.banned?.message}</div>}
         </div>
         <div class={style.solution}>
-          <div>Solution:</div>
+          <div class={style.propName}>Solution:</div>
           <input class={state?.solution?.valid ? style.inputValid : style.inputInvalid} value={state?.solution?.value || ''} onInput={onSolutionChange} />
           {state?.solution?.message && <div class={style.errorMessage}>{state?.solution?.message}</div>}
         </div>
         <div class={style.input}>
-          <div>Input:</div>
+          <div class={style.propName}>Input:</div>
           <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows="5" cols="50" />
           {state?.input?.message && <div class={style.errorMessage}>{state?.input?.message}</div>}
           <MarkupRenderer lines={lines} expected={state?.expected} />
@@ -100,23 +100,23 @@ export default function NewCss({ state, onChange }) {
       <div class={style.examples}>
       <div class={style.title}>Example</div>
         <div class={style.name}>
-          <div>Name:</div>
+          <div class={style.propName}>Name:</div>
           <input value="Puzzle name" readonly="readonly" />
         </div>
         <div class={style.description}>
-          <div>Description:</div>
+          <div class={style.propName}>Description:</div>
           <input value="Short description" readonly="readonly" />
         </div>
         <div class={style.banned}>
-          <div>Banned characters:</div>
+          <div class={style.propName}>Banned characters:</div>
           <input value={'["#", ","]'} readonly="readonly" />
         </div>
         <div class={style.solution}>
-          <div>Solution:</div>
+          <div class={style.propName}>Solution:</div>
           <input value=".spcl" readonly="readonly" />
         </div>
         <div class={style.input}>
-          <div>Input:</div>
+          <div class={style.propName}>Input:</div>
           <textarea value={'<div><span class="spcl">content</span></div>'} readonly="readonly" rows="5" cols="50" />
         </div>
       </div>
