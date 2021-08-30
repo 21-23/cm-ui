@@ -7,7 +7,6 @@ import style from './NewCss.css';
 
 export default function NewCss({ state, onChange }) {
   const [lines, setLines] = useState([]);
-  const [expected, setExpected] = useState([]);
 
   function onNameChange(event) {
     const { value } = event.target;
@@ -25,50 +24,44 @@ export default function NewCss({ state, onChange }) {
 
   function onBannedChange(event) {
     const { value } = event.target;
-    try {
-      const banned = JSON.parse(value);
-      if (!Array.isArray(banned)) {
-        return onChange({ ...state, banned: { value, valid: false, message: 'Banned characters must be an array. Example: [".", "#", "d"]' } });
-      }
-      if (banned.some((char) => !char || typeof char !== 'string')) {
-        return onChange({ ...state, banned: { value, valid: false, message: 'Banned characters must be non-empty strings. Example: [".", "#", "d"]' } });
-      }
-      const solutionError = validateBannedChars(state?.solution?.value, banned);
-      return onChange({ ...state, banned: { value, valid: true }, solution: { ...state?.solution, valid: !solutionError, message: solutionError }});
-    } catch(error) {
-      console.log('Failed to parse `Banned characters`', error);
-      onChange({ ...state, banned: { value, valid: false, message: 'Invalid JSON. Example: [".", "#", "d"]' } });
-    }
+
+    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, state?.solution?.value, value);
+
+    setLines(lines);
+    onChange({
+      ...state,
+      expected,
+      banned: { value, valid: !bannedError, message: bannedError },
+      input: { ...state?.input, valid: !inputError, message: inputError },
+      solution: { ...state?.solution, valid: !solutionError, message: solutionError },
+    });
   }
 
   function onSolutionChange(event) {
     const { value } = event.target;
 
-    const { lines, expected, solutionError } = applySolution(state?.input?.value, value);
-    let solutionBannedError = '';
-    try {
-      const banned = JSON.parse(state?.banned?.value);
-      solutionBannedError = validateBannedChars(value, banned || []);
-    } catch {
-      //
-    }
-    const valid = !solutionError && !solutionBannedError;
+    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, value, state?.banned?.value);
 
     setLines(lines);
-    setExpected(expected);
-    onChange({ ...state, expected, solution: { value, valid, message: solutionError || solutionBannedError } });
+    onChange({
+      ...state,
+      expected,
+      banned: { ...state?.banned, valid: !bannedError, message: bannedError },
+      input: { ...state?.input, valid: !inputError, message: inputError },
+      solution: { value, valid: !solutionError, message: solutionError },
+    });
   }
 
   function onInputChange(event) {
     const { value } = event.target;
 
-    const { lines, expected, inputError, solutionError } = applySolution(value, state?.solution?.value);
+    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(value, state?.solution?.value, state?.banned?.value);
 
     setLines(lines);
-    setExpected(expected);
     onChange({
       ...state,
       expected,
+      banned: { ...state?.banned, valid: !bannedError, message: bannedError },
       input: { value, valid: !inputError, message: inputError },
       solution: { ...state?.solution, valid: !solutionError, message: solutionError },
     });
@@ -101,7 +94,7 @@ export default function NewCss({ state, onChange }) {
           <div>Input:</div>
           <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows="5" cols="50" />
           {state?.input?.message && <div class={style.errorMessage}>{state?.input?.message}</div>}
-          <MarkupRenderer lines={lines} expected={expected} />
+          <MarkupRenderer lines={lines} expected={state?.expected} />
         </div>
       </div>
       <div class={style.examples}>
@@ -131,53 +124,76 @@ export default function NewCss({ state, onChange }) {
   );
 }
 
-function validateBannedChars(solution, banned) {
-  if (!solution) {
-    return 'Solution can not be empty';
-  }
-  if (banned.length < 1) {
-    return '';
-  }
-
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-  const escapeSymbolsRegex = /[.*+?^${}()|[\]\\]/g;
-  const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
-  if (new RegExp(`(${chars})`, 'i').test(solution)) {
-    return 'Solution can not contain banned characters';
-  }
-
-  return '';
-}
-
-function applySolution(input, solution) {
+function validateSolution(inputValue, solutionValue, bannedValue) {
+  let { input, inputError } = parseInput(inputValue);
+  let { solution, solutionError } = parseSolution(solutionValue);
+  let { banned, bannedError } = parseBanned(bannedValue);
   let lines = [];
   let expected = [];
-  let inputError = '';
-  let solutionError = '';
 
-  if (!input) {
-    return { lines, expected, inputError: 'Input can not be empty', solutionError };
-  }
-
-  const container = document.createElement('div');
-  container.innerHTML = input;
-  lines = nodesToLines(Array.from(container.childNodes), { qdIdCounter: 0 }, 0);
-
-  if (!solution) {
-    return { lines, expected, inputError, solutionError: 'Solution can not be empty' };
-  }
-
-  try {
-    expected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
-    if (expected.length < 1) {
-      return { lines, expected, inputError, solutionError: 'Given solution does not query any node from the input' };
+  // check solution for banned characters
+  if (!solutionError && !bannedError && banned.length > 0) {
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+    const escapeSymbolsRegex = /[.*+?^${}()|[\]\\]/g;
+    const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
+    if (new RegExp(`(${chars})`, 'i').test(solution)) {
+      solutionError = 'Solution can not contain banned characters';
     }
-  } catch (error) {
-    console.log('Failed to run solution', error);
-    return { lines, expected, inputError, solutionError: 'Can not query select' };
   }
 
-  return { lines, expected, inputError, solutionError };
+  // parse input to lines
+  if (!inputError) {
+    const container = document.createElement('div');
+    container.innerHTML = input;
+    lines = nodesToLines(Array.from(container.childNodes), { qdIdCounter: 0 }, 0);
+
+    // apply solution
+    if (!solutionError) {
+      try {
+        expected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
+        if (expected.length < 1) {
+          solutionError = 'Given solution does not query any node from the input';
+        }
+      } catch (error) {
+        console.log('Failed to run solution', error);
+        solutionError = 'Can not querySelectorAll the given solution';
+      }
+    }
+  }
+
+  return { lines, expected, inputError, solutionError, bannedError };
+}
+
+function parseInput(inputValue) {
+  if (!inputValue) {
+    return { input: inputValue, inputError: 'Input can not be empty' };
+  }
+
+  return { input: inputValue, inputError: '' };
+}
+
+function parseSolution(solutionValue) {
+  if (!solutionValue) {
+    return { solution: solutionValue, solutionError: 'Solution can not be empty' };
+  }
+
+  return { solution: solutionValue, solutionError: '' };
+}
+
+function parseBanned(bannedValue) {
+  try {
+    const banned = JSON.parse(bannedValue);
+    if (!Array.isArray(banned)) {
+      return { banned, bannedError: 'Banned characters must be an array. Example: [".", "#", "d"]' };
+    }
+    if (banned.some((char) => !char || typeof char !== 'string')) {
+      return { banned, bannedError: 'Banned characters must be non-empty strings. Example: [".", "#", "d"]' };
+    }
+    return { banned, bannedError: '' };
+  } catch(error) {
+    console.log('Failed to parse `Banned characters`', error);
+    return { banned: [], bannedError: 'Invalid JSON. Example: [".", "#", "d"]' };
+  }
 }
 
 function MarkupRenderer({ lines, expected }) {
