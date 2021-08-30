@@ -1,9 +1,9 @@
 // YOLO: on
 
-import { h } from 'preact';
+import { FunctionalComponent, h } from 'preact';
 // import style from './style.css';
 
-export default function Header() {
+const Header: FunctionalComponent = () => {
   return (
     <header>
       Quick Draw Content Management
@@ -11,3 +11,4 @@ export default function Header() {
   );
 }
 
+export default Header;
