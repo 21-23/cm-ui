@@ -135,7 +135,7 @@ function validateBannedChars(solution, banned) {
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
   const escapeSymbolsRegex = /[.*+?^${}()|[\]\\]/g;
   const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
-  if (new RegExp(`(${chars})`, 'i').test()) {
+  if (new RegExp(`(${chars})`, 'i').test(solution)) {
     return 'Solution can not contain banned characters';
   }
 
