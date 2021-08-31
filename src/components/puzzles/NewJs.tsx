@@ -1,12 +1,19 @@
 // YOLO: on
 
-import { h } from 'preact';
+import { FunctionalComponent, h, JSX } from 'preact';
+
+import type { NewPuzzleStateType } from '../../types/types';
 
 import style from './NewJs.css';
 
-export default function NewJs({ state, onChange }) {
-  function onNameChange(event) {
-    const { value } = event.target;
+type NewJsPropsType = {
+  state: NewPuzzleStateType,
+  onChange: (state: NewPuzzleStateType) => void,
+};
+
+const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
+  function onNameChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    const { value } = event.currentTarget;
 
     if (!value) {
       return onChange({ ...state, name: { value, valid: false, message: 'Name can not be empty' } });
@@ -15,37 +22,34 @@ export default function NewJs({ state, onChange }) {
     onChange({ ...state, name: { value, valid: true } });
   }
 
-  function onDescriptionChange(event) {
-    onChange({ ...state, description: { value: event.target.value, valid: true } });
+  function onDescriptionChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    onChange({ ...state, description: { value: event.currentTarget.value, valid: true } });
   }
 
-  function onSolutionChange() {
-    const { value } = event.target;
+  function onSolutionChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>) {
+    const { value } = event.currentTarget;
 
-    if (!value) {
-      return onChange({ ...state, solution: { value, valid: false, message: 'Solution can not be empty' } });
-    }
-
-    const { expected, solutionError } = applySolution(state?.input?.value, value);
+    const { expected, inputError, solutionError } = applySolution(state?.input?.value, value);
 
     return onChange({
       ...state,
       expected,
+      input: { ...state?.input, valid: !inputError, message: inputError },
       solution: { value, valid: !solutionError, message: solutionError },
     });
   }
 
-  function onInputChange(event) {
-    const { value } = event.target;
+  function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>) {
+    const { value } = event.currentTarget;
 
-    try {
-      JSON.parse(value);
-      const { expected, inputError } = applySolution(value, state?.solution?.value);
-      return onChange({...state, expected, input: { value, valid: !inputError, message: inputError } });
-    } catch (error) {
-      console.log('Failed to parse `Input`', error);
-      return onChange({...state, input: { value, valid: false, message: 'Can not parse Input' } });
-    }
+    const { expected, inputError, solutionError } = applySolution(value, state?.solution?.value);
+
+    return onChange({
+      ...state,
+      expected,
+      input: { value, valid: !inputError, message: inputError },
+      solution: { ...state?.solution, valid: !solutionError, message: solutionError },
+    });
   }
 
   return (
@@ -63,12 +67,12 @@ export default function NewJs({ state, onChange }) {
         </div>
         <div class={style.solution}>
           <div><span class={style.propName}>Solution</span> (function body, <span class={style.highlight}>input</span> is passed as <span class={style.highlight}>arg</span> automatically):</div>
-          <textarea class={state?.solution?.valid ? style.inputValid : style.inputInvalid} value={state?.solution?.value || ''} onInput={onSolutionChange} rows="5" cols="50" />
+          <textarea class={state?.solution?.valid ? style.inputValid : style.inputInvalid} value={state?.solution?.value || ''} onInput={onSolutionChange} rows={5} cols={50} />
           {state?.solution?.message && <div class={style.errorMessage}>{state?.solution?.message}</div>}
         </div>
         <div class={style.input}>
           <div><span class={style.propName}>Input</span> (JSON, automatically assigned to <span class={style.highlight}>arg</span> parameter):</div>
-          <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows="5" cols="50" />
+          <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows={5} cols={50} />
           {state?.input?.message && <div class={style.errorMessage}>{state?.input?.message}</div>}
         </div>
         <pre class={style.expected}>
@@ -79,41 +83,52 @@ export default function NewJs({ state, onChange }) {
         <div class={style.title}>Example</div>
         <div class={style.name}>
           <div class={style.propName}>Name:</div>
-          <input value="Puzzle name" readonly="readonly" />
+          <input value="Puzzle name" readonly />
         </div>
         <div class={style.description}>
           <div class={style.propName}>Description:</div>
-          <input value="Multiply each element of the array by 2" readonly="readonly" />
+          <input value="Multiply each element of the array by 2" readonly />
         </div>
         <div class={style.solution}>
           <div class={style.propName}>Solution:</div>
-          <textarea value={'return arg.map(e => e * 2);'} readonly="readonly" rows="5" cols="50" />
+          <textarea value={'return arg.map(e => e * 2);'} readonly rows={5} cols={50} />
         </div>
         <div class={style.input}>
           <div class={style.propName}>Input:</div>
-          <textarea value={'[1, 2, 3]'} readonly="readonly" rows="5" cols="50" />
+          <textarea value={'[1, 2, 3]'} readonly rows={5} cols={50} />
         </div>
       </div>
     </div>
   );
 }
 
-function applySolution(input, solution) {
-  let expected = '';
-  let inputError = '';
-  let solutionError = '';
+export default NewJs;
 
-  if (!input) {
+function applySolution(inputValue?: string, solution?: string): { expected: string, inputError: string, solutionError: string } {
+  const expected = '';
+  const inputError = '';
+  const solutionError = '';
+
+  if (!inputValue) {
     return { expected, inputError: 'Input can not be empty', solutionError };
   }
   if (!solution) {
     return { expected, inputError, solutionError: 'Solution can not be empty' };
   }
 
+  let input = null;
   try {
-    const stub = {}; // eslint-disable-line no-unused-vars
-    const stubFun = () => {}; // eslint-disable-line no-unused-vars
-    const puzzleContent = JSON.parse(input); // eslint-disable-line no-unused-vars
+    input = JSON.parse(inputValue);
+  } catch (error) {
+    console.log('Failed to parse `Input`', error);
+    return { expected, inputError: 'Can not parse Input', solutionError };
+  }
+
+  try {
+    const stub = {}; // eslint-disable-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const stubFun = () => {}; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const puzzleContent = input; // eslint-disable-line @typescript-eslint/no-unused-vars
     const result = eval(`(function(_, content, ipcRenderer, window, document, location, alert, $, require, process, global, setTimeout, setInterval, requestAnimationFrame, requestIdleCallback, qd) {"use strict"; return (function (arg) {${ solution }})(content);}).call(stub, stub, puzzleContent, stub, stub, stub, stub, stubFun, stub, stubFun, stub, stub, stubFun, stubFun, stubFun, stubFun, stub)`);
     return { expected: JSON.stringify(result), inputError, solutionError };
   } catch (error) {
