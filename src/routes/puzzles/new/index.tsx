@@ -44,7 +44,7 @@ const NewPuzzle: FunctionalComponent = () => {
       description: { value: '', valid: false },
       expected: '',
       banned: { value: JSON.stringify([]), valid: true },
-      input: { value: '', valid: false },
+      input: { value: '', internal: '', valid: false },
       solution: { value: '', valid: false },
     },
     JS: {
@@ -73,7 +73,7 @@ const NewPuzzle: FunctionalComponent = () => {
       <GameSelector selected={game} onChange={(game) => setGame(game)} />
       {game === 'CSS' && <NewCss state={newPuzzle.CSS} onChange={(CSS) => setNewPuzzle({ ...newPuzzle, CSS })} />}
       {game === 'JS' && <NewJs state={newPuzzle.JS} onChange={(JS) => setNewPuzzle({ ...newPuzzle, JS })} />}
-      {/* {game === 'Lodash' && <NewLodash state={newPuzzle.Lodash} onChange={(Lodash) => setNewPuzzle({ ...newPuzzle, Lodash })} />} */}
+      {game === 'Lodash' && <NewLodash state={newPuzzle.Lodash} onChange={(Lodash) => setNewPuzzle({ ...newPuzzle, Lodash })} />}
     </>
   );
 }

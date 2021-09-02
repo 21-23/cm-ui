@@ -24,7 +24,7 @@ type NewCssPropsType = {
 const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
   const [lines, setLines] = useState<Line[]>([]);
 
-  function onNameChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+  function onNameChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
     if (!value) {
@@ -38,10 +38,10 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
     onChange({ ...state, description: { value: event.currentTarget.value, valid: true } });
   }
 
-  function onBannedChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+  function onBannedChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
-    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, state?.solution?.value, value);
+    const { lines,  expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, state?.solution?.value, value);
 
     setLines(lines);
     onChange({
@@ -53,7 +53,7 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
     });
   }
 
-  function onSolutionChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+  function onSolutionChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
     const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, value, state?.banned?.value);
@@ -68,17 +68,17 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
     });
   }
 
-  function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>) {
+  function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>): void {
     const { value } = event.currentTarget;
 
-    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(value, state?.solution?.value, state?.banned?.value);
+    const { lines, internalInput, expected, inputError, solutionError, bannedError } = validateSolution(value, state?.solution?.value, state?.banned?.value);
 
     setLines(lines);
     onChange({
       ...state,
       expected,
       banned: { ...state?.banned, valid: !bannedError, message: bannedError },
-      input: { value, valid: !inputError, message: inputError },
+      input: { value, internal: internalInput, valid: !inputError, message: inputError },
       solution: { ...state?.solution, valid: !solutionError, message: solutionError },
     });
   }
@@ -142,7 +142,7 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
 
 export default NewCss;
 
-function validateSolution(inputValue: string, solutionValue: string, bannedValue: string) {
+function validateSolution(inputValue: string, solutionValue: string, bannedValue: string): { internalInput: string, lines: Line[], expected: string, inputError: string, solutionError: string, bannedError: string } {
   const { input, inputError } = parseInput(inputValue);
   const parsedSolution = parseSolution(solutionValue);
   let solutionError = parsedSolution.solutionError;
@@ -150,6 +150,7 @@ function validateSolution(inputValue: string, solutionValue: string, bannedValue
   const { banned, bannedError } = parseBanned(bannedValue);
   let lines: Line[] = [];
   let expected: string[] = [];
+  let internalInput = '';
 
   // check solution for banned characters
   if (!solutionError && !bannedError && banned.length > 0) {
@@ -165,12 +166,14 @@ function validateSolution(inputValue: string, solutionValue: string, bannedValue
   if (!inputError) {
     const container = document.createElement('div');
     container.innerHTML = input;
+    // nodesToLines also sets data-qdid attributes required for `expected`
     lines = nodesToLines(Array.from(container.childNodes as NodeListOf<Element>), { qdIdCounter: 0 }, 0);
-    // if (lines.length > 0) {
+    if (lines.length > 0) {
+      // `input` contains actual creator input but we should save
       const decoder = document.createElement('textarea');
       decoder.innerHTML = container.innerHTML;
-      console.log(decoder.value); // TODO: store this value and actually send to server
-    // }
+      internalInput = decoder.value;
+    }
 
     // apply solution
     if (!solutionError) {
@@ -186,7 +189,7 @@ function validateSolution(inputValue: string, solutionValue: string, bannedValue
     }
   }
 
-  return { lines, expected: JSON.stringify(expected), inputError, solutionError, bannedError };
+  return { internalInput, lines, expected: JSON.stringify(expected), inputError, solutionError, bannedError };
 }
 
 function parseInput(inputValue: string): { input: string, inputError: string } {

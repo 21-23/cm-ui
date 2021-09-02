@@ -12,7 +12,7 @@ type NewJsPropsType = {
 };
 
 const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
-  function onNameChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+  function onNameChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
     if (!value) {
@@ -26,7 +26,7 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
     onChange({ ...state, description: { value: event.currentTarget.value, valid: true } });
   }
 
-  function onSolutionChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>) {
+  function onSolutionChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>): void {
     const { value } = event.currentTarget;
 
     const { expected, inputError, solutionError } = applySolution(state?.input?.value, value);
@@ -39,7 +39,7 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
     });
   }
 
-  function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>) {
+  function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>): void {
     const { value } = event.currentTarget;
 
     const { expected, inputError, solutionError } = applySolution(value, state?.solution?.value);
