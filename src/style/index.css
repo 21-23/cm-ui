@@ -43,3 +43,7 @@ button.-active {
 	background: #864e83;
 	color: #fff;
 }
+
+input {
+	border: 1px solid #000;
+}
