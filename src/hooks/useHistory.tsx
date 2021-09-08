@@ -1,8 +1,8 @@
 import { useState } from "preact/hooks";
-import { createHashHistory } from 'history';
+import { createHashHistory, HashHistory } from 'history';
 
-export default function useHistory() {
-  const [history] = useState(() => {
+export default function useHistory(): HashHistory {
+  const [history] = useState<HashHistory>(() => {
     const hashHistory = createHashHistory();
     const hashHistoryListen = hashHistory.listen.bind(hashHistory);
 
@@ -11,6 +11,8 @@ export default function useHistory() {
     // but preact-router expects `location` right away
     hashHistory.listen = (callback) => {
       return hashHistoryListen(({ location }) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         return callback(location);
       });
     }

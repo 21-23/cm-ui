@@ -1,15 +1,31 @@
 // YOLO: on
 
-import { h } from 'preact';
+import { FunctionalComponent, h, JSX } from 'preact';
 import { useState } from 'preact/hooks';
+
+import type { NewPuzzleStateType } from '../../types/types';
 
 import style from './NewCss.css';
 
-export default function NewCss({ state, onChange }) {
-  const [lines, setLines] = useState([]);
+type Line = {
+  qdId: string,
+  tagName: string,
+  tagValue: string | null,
+  selfClosing: boolean,
+  indent: number,
+  attributes: Array<{ name: string, value: string }>,
+};
 
-  function onNameChange(event) {
-    const { value } = event.target;
+type NewCssPropsType = {
+  state: NewPuzzleStateType,
+  onChange: (state: NewPuzzleStateType) => void,
+};
+
+const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
+  const [lines, setLines] = useState<Line[]>([]);
+
+  function onNameChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
+    const { value } = event.currentTarget;
 
     if (!value) {
       return onChange({ ...state, name: { value, valid: false, message: 'Name can not be empty' } });
@@ -18,14 +34,14 @@ export default function NewCss({ state, onChange }) {
     onChange({ ...state, name: { value, valid: true } });
   }
 
-  function onDescriptionChange(event) {
-    onChange({ ...state, description: { value: event.target.value, valid: true } });
+  function onDescriptionChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    onChange({ ...state, description: { value: event.currentTarget.value, valid: true } });
   }
 
-  function onBannedChange(event) {
-    const { value } = event.target;
+  function onBannedChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
+    const { value } = event.currentTarget;
 
-    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, state?.solution?.value, value);
+    const { lines,  expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, state?.solution?.value, value);
 
     setLines(lines);
     onChange({
@@ -37,8 +53,8 @@ export default function NewCss({ state, onChange }) {
     });
   }
 
-  function onSolutionChange(event) {
-    const { value } = event.target;
+  function onSolutionChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
+    const { value } = event.currentTarget;
 
     const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, value, state?.banned?.value);
 
@@ -52,17 +68,17 @@ export default function NewCss({ state, onChange }) {
     });
   }
 
-  function onInputChange(event) {
-    const { value } = event.target;
+  function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>): void {
+    const { value } = event.currentTarget;
 
-    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(value, state?.solution?.value, state?.banned?.value);
+    const { lines, internalInput, expected, inputError, solutionError, bannedError } = validateSolution(value, state?.solution?.value, state?.banned?.value);
 
     setLines(lines);
     onChange({
       ...state,
       expected,
       banned: { ...state?.banned, valid: !bannedError, message: bannedError },
-      input: { value, valid: !inputError, message: inputError },
+      input: { value, internal: internalInput, valid: !inputError, message: inputError },
       solution: { ...state?.solution, valid: !solutionError, message: solutionError },
     });
   }
@@ -92,7 +108,7 @@ export default function NewCss({ state, onChange }) {
         </div>
         <div class={style.input}>
           <div class={style.propName}>Input:</div>
-          <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows="5" cols="50" />
+          <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows={5} cols={50} />
           {state?.input?.message && <div class={style.errorMessage}>{state?.input?.message}</div>}
           <MarkupRenderer lines={lines} expected={state?.expected} />
         </div>
@@ -101,35 +117,40 @@ export default function NewCss({ state, onChange }) {
       <div class={style.title}>Example</div>
         <div class={style.name}>
           <div class={style.propName}>Name:</div>
-          <input value="Puzzle name" readonly="readonly" />
+          <input value="Puzzle name" readonly />
         </div>
         <div class={style.description}>
           <div class={style.propName}>Description:</div>
-          <input value="Short description" readonly="readonly" />
+          <input value="Short description" readonly />
         </div>
         <div class={style.banned}>
           <div class={style.propName}>Banned characters:</div>
-          <input value={'["#", ","]'} readonly="readonly" />
+          <input value={'["#", ","]'} readonly />
         </div>
         <div class={style.solution}>
           <div class={style.propName}>Solution:</div>
-          <input value=".spcl" readonly="readonly" />
+          <input value=".spcl" readonly />
         </div>
         <div class={style.input}>
           <div class={style.propName}>Input:</div>
-          <textarea value={'<div><span class="spcl">content</span></div>'} readonly="readonly" rows="5" cols="50" />
+          <textarea value={'<div><span class="spcl">content</span></div>'} readonly rows={5} cols={50} />
         </div>
       </div>
     </div>
   );
 }
 
-function validateSolution(inputValue, solutionValue, bannedValue) {
-  let { input, inputError } = parseInput(inputValue);
-  let { solution, solutionError } = parseSolution(solutionValue);
-  let { banned, bannedError } = parseBanned(bannedValue);
-  let lines = [];
-  let expected = [];
+export default NewCss;
+
+function validateSolution(inputValue: string, solutionValue: string, bannedValue: string): { internalInput: string, lines: Line[], expected: string, inputError: string, solutionError: string, bannedError: string } {
+  const { input, inputError } = parseInput(inputValue);
+  const parsedSolution = parseSolution(solutionValue);
+  let solutionError = parsedSolution.solutionError;
+  const solution = parsedSolution.solution;
+  const { banned, bannedError } = parseBanned(bannedValue);
+  let lines: Line[] = [];
+  let expected: string[] = [];
+  let internalInput = '';
 
   // check solution for banned characters
   if (!solutionError && !bannedError && banned.length > 0) {
@@ -145,12 +166,19 @@ function validateSolution(inputValue, solutionValue, bannedValue) {
   if (!inputError) {
     const container = document.createElement('div');
     container.innerHTML = input;
-    lines = nodesToLines(Array.from(container.childNodes), { qdIdCounter: 0 }, 0);
+    // nodesToLines also sets data-qdid attributes required for `expected`
+    lines = nodesToLines(Array.from(container.childNodes as NodeListOf<Element>), { qdIdCounter: 0 }, 0);
+    if (lines.length > 0) {
+      // `input` contains actual creator input but we should save
+      const decoder = document.createElement('textarea');
+      decoder.innerHTML = container.innerHTML;
+      internalInput = decoder.value;
+    }
 
     // apply solution
     if (!solutionError) {
       try {
-        expected = Array.from(container.querySelectorAll(solution)).map((node) => node.dataset['qdid']);
+        expected = Array.from(container.querySelectorAll<HTMLElement>(solution)).map<string>((node) => node.dataset['qdid'] || '').filter(qdid => !!qdid);
         if (expected.length < 1) {
           solutionError = 'Given solution does not query any node from the input';
         }
@@ -161,10 +189,10 @@ function validateSolution(inputValue, solutionValue, bannedValue) {
     }
   }
 
-  return { lines, expected, inputError, solutionError, bannedError };
+  return { internalInput, lines, expected: JSON.stringify(expected), inputError, solutionError, bannedError };
 }
 
-function parseInput(inputValue) {
+function parseInput(inputValue: string): { input: string, inputError: string } {
   if (!inputValue) {
     return { input: inputValue, inputError: 'Input can not be empty' };
   }
@@ -172,7 +200,7 @@ function parseInput(inputValue) {
   return { input: inputValue, inputError: '' };
 }
 
-function parseSolution(solutionValue) {
+function parseSolution(solutionValue: string): { solution: string, solutionError: string } {
   if (!solutionValue) {
     return { solution: solutionValue, solutionError: 'Solution can not be empty' };
   }
@@ -180,7 +208,7 @@ function parseSolution(solutionValue) {
   return { solution: solutionValue, solutionError: '' };
 }
 
-function parseBanned(bannedValue) {
+function parseBanned(bannedValue: string): { banned: string[], bannedError: string } {
   try {
     const banned = JSON.parse(bannedValue);
     if (!Array.isArray(banned)) {
@@ -196,17 +224,34 @@ function parseBanned(bannedValue) {
   }
 }
 
-function MarkupRenderer({ lines, expected }) {
+type MarkupRendererPropsType = {
+  lines: Line[],
+  expected: string,
+};
+const MarkupRenderer: FunctionalComponent<MarkupRendererPropsType> = ({ lines, expected }) => {
+  let arrayOfExpected: string[] = [];
+  try {
+    if (expected) {
+      arrayOfExpected = JSON.parse(expected);
+    }
+  } catch (error) {
+    console.log('Failed to parse `expected`', error);
+  }
+
   return (
     <pre class={style.expected}>
       {lines.map((line, index) => {
-        return <Line line={line} key={index} selected={expected.includes(line.qdId)} />
+        return <Line line={line} key={index} selected={arrayOfExpected.includes(line.qdId)} />
       })}
     </pre>
   );
 }
 
-function Line({ line, selected }) {
+type LinePropsType = {
+  line: Line,
+  selected: boolean,
+};
+const Line: FunctionalComponent<LinePropsType> = ({ line, selected }) => {
   if (line.tagName === '#text') {
     return <div class={style.line}>
       <span>{'  '.repeat(line.indent)}</span>
@@ -235,8 +280,8 @@ function Line({ line, selected }) {
   </div>
 }
 
-function nodesToLines(nodes, options, indent) {
-  const lines = [];
+function nodesToLines(nodes: Element[], options: { qdIdCounter: number }, indent: number): Line[] {
+  const lines: Line[] = [];
 
   nodes.forEach((node) => {
     const qdId = `${++options.qdIdCounter}`;
@@ -247,7 +292,7 @@ function nodesToLines(nodes, options, indent) {
     }
     node.setAttribute('data-qdid', qdId);
     if (node.children.length > 0 || !line.selfClosing) {
-      lines.push(...nodesToLines(Array.from(node.childNodes), options, indent + 1));
+      lines.push(...nodesToLines(Array.from(node.childNodes as NodeListOf<Element>), options, indent + 1));
       lines.push(nodeToLine(node, '-1', indent));
     }
   });
@@ -256,9 +301,9 @@ function nodesToLines(nodes, options, indent) {
 }
 
 // https://www.w3.org/TR/html51/syntax.html#void-elements
-const VOID_ELEMENTS = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
+const VOID_ELEMENTS: string[] = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'menuitem', 'meta', 'param', 'source', 'track', 'wbr'];
 
-function nodeToLine(node, qdId, indent) {
+function nodeToLine(node: Element, qdId: string, indent: number): Line {
   const tagName = node.nodeName.toLowerCase();
 
   return {

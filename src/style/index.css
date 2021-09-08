@@ -1,16 +1,16 @@
 /* YOLO: on */
 
 html, body {
-	height: 100%;
-	width: 100%;
-	padding: 0;
-	margin: 0;
-	background: #FAFAFA;
-	font-family: 'Helvetica Neue', arial, sans-serif;
-	font-weight: 400;
-	color: #444;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: #FAFAFA;
+  font-family: 'Helvetica Neue', arial, sans-serif;
+  font-weight: 400;
+  color: #444;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -18,11 +18,11 @@ html, body {
 }
 
 header {
-	min-height: 2em;
-	border-bottom: 1px solid #442342;
-	display: flex;
-	align-items: center;
-	padding: 0 1em;
+  min-height: 2em;
+  border-bottom: 1px solid #442342;
+  display: flex;
+  align-items: center;
+  padding: 0 1em;
 }
 
 #app {
@@ -30,20 +30,20 @@ header {
 }
 
 button {
-	padding: .3em 1em;
-	background: transparent;
-	border: 1px solid #333;
-	cursor: pointer;
-	transition: background 100ms;
+  padding: .3em 1em;
+  background: transparent;
+  border: 1px solid #333;
+  cursor: pointer;
+  transition: background 100ms;
 }
 button:hover {
-	background: #ffedfe;
+  background: #ffedfe;
 }
 button.-active {
-	background: #864e83;
-	color: #fff;
+  background: #864e83;
+  color: #fff;
 }
 
 input {
-	border: 1px solid #000;
+  border: 1px solid #000;
 }
