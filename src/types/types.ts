@@ -10,6 +10,7 @@ type NewPuzzleStatePropertyType<ValueT, InternalT> = {
 export type NewPuzzleStateType = {
   name: NewPuzzleStatePropertyType<string, void>,
   description: NewPuzzleStatePropertyType<string, void>,
+  timeLimit: NewPuzzleStatePropertyType<number, void>,
   expected: string,
   banned: NewPuzzleStatePropertyType<string, void>,
   input: NewPuzzleStatePropertyType<string, string>,

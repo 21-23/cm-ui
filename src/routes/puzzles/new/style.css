@@ -8,3 +8,7 @@
 .gameSelector {
   display: flex;
 }
+
+.actions {
+  padding: .5em;
+}

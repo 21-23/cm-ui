@@ -43,6 +43,16 @@ button.-active {
   background: #864e83;
   color: #fff;
 }
+button.-positive {
+  background: #239b12;
+  color: #fff;
+}
+button.-positive:hover {
+  background: #4fb342;
+}
+button.-bigger {
+  font-size: 120%;
+}
 
 input {
   border: 1px solid #000;

@@ -6,6 +6,7 @@ import { Route, Router } from 'preact-router';
 
 import PuzzleList from './list';
 import NewPuzzle from './new';
+import NewHiddenTest from './new-hidden'
 
 const Puzzles: FunctionalComponent = () => {
   return (
@@ -13,6 +14,7 @@ const Puzzles: FunctionalComponent = () => {
       <Router>
         <Route path="/puzzles" component={PuzzleList} />
         <Route path="/puzzles/new" component={NewPuzzle} />
+        <Route path="/puzzles/new/hidden" component={NewHiddenTest} />
       </Router>
     </div>
   );

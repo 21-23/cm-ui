@@ -1,10 +1,12 @@
 // YOLO: on
 
 import { FunctionalComponent, h } from 'preact';
-
+import { route } from 'preact-router';
 import { useState } from "preact/hooks";
+
 import style from './style.css';
 import type { GameType, NewPuzzleStateType } from '../../../types/types';
+import { createPuzzle } from '../../../services/puzzle';
 
 import NewCss from '../../../components/puzzles/NewCss';
 import NewJs from '../../../components/puzzles/NewJs';
@@ -17,6 +19,8 @@ const Game: { [key in GameType]: string } = {
 };
 
 const GAMES: GameType[] = Object.keys(Game) as GameType[];
+
+export type ActionStateType = 'IDLE' | 'IN_PROGRESS';
 
 type GameSelectorPropsType = {
   selected: GameType,
@@ -41,7 +45,8 @@ const NewPuzzle: FunctionalComponent = () => {
   const [newPuzzle, setNewPuzzle] = useState<{ [key in GameType]: NewPuzzleStateType }>({
     CSS: {
       name: { value: '', valid: false },
-      description: { value: '', valid: false },
+      description: { value: '', valid: true },
+      timeLimit: { value: 180, valid: true },
       expected: '',
       banned: { value: JSON.stringify([]), valid: true },
       input: { value: '', internal: '', valid: false },
@@ -49,7 +54,8 @@ const NewPuzzle: FunctionalComponent = () => {
     },
     JS: {
       name: { value: '', valid: false },
-      description: { value: '', valid: false },
+      description: { value: '', valid: true },
+      timeLimit: { value: 180, valid: true },
       expected: '',
       banned: { value: '', valid: false },
       input: { value: '', valid: false },
@@ -57,18 +63,52 @@ const NewPuzzle: FunctionalComponent = () => {
     },
     Lodash: {
       name: { value: '', valid: false },
-      description: { value: '', valid: false },
+      description: { value: '', valid: true },
+      timeLimit: { value: 180, valid: true },
       expected: '',
       banned: { value: '', valid: false },
       input: { value: '', valid: false },
       solution: { value: '', valid: false },
     },
   });
+  const [actionState, setActionState] = useState<ActionStateType>('IDLE');
+
+  async function createPuzzleClick() {
+    const puzzleState = newPuzzle[game];
+
+    const errors = Object.entries(puzzleState)
+      .map(([key, value]) => {
+        return !value || (typeof value !== 'string' && !value?.valid) ? key : null;
+      })
+      .filter(key => !!key);
+
+    if (errors.length > 0) {
+      return window.alert(`Some properties are invalid: ${errors}`);
+    }
+
+    // there should be a spinner
+    if (actionState !== 'IDLE') {
+      return window.alert('Another action is in progress');
+    }
+    setActionState('IN_PROGRESS');
+
+    try {
+      await createPuzzle(Game[game], puzzleState);
+    } catch (error) {
+      alert(JSON.stringify(error));
+    } finally {
+      setActionState('IDLE');
+    }
+  }
 
   return (
     <>
       <div class={style.title}>
         NEW PUZZLE
+      </div>
+      <div class={style.actions}>
+        <button className="-positive -bigger" onClick={createPuzzleClick}>Create</button>
+        <button className="-bigger" onClick={() => route('/puzzles/new/hidden')}>Add hidden test</button>
       </div>
       <GameSelector selected={game} onChange={(game) => setGame(game)} />
       {game === 'CSS' && <NewCss state={newPuzzle.CSS} onChange={(CSS) => setNewPuzzle({ ...newPuzzle, CSS })} />}

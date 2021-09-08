@@ -23,6 +23,11 @@
   padding: .3em 0;
 }
 
+.timeLimit {
+  display: flex;
+  padding: .3em 0;
+}
+
 .banned {
   display: flex;
   padding: .3em 0;

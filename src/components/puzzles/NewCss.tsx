@@ -38,6 +38,11 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
     onChange({ ...state, description: { value: event.currentTarget.value, valid: true } });
   }
 
+  function onTimeLimitChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    const value = Number.isNaN(event.currentTarget.valueAsNumber) ? 1 : event.currentTarget.valueAsNumber;
+    onChange({ ...state, timeLimit: { value, valid: true } });
+  }
+
   function onBannedChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
@@ -96,6 +101,10 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
           <div class={style.propName}>Description:</div>
           <input value={state?.description?.value || ''} onInput={onDescriptionChange} />
         </div>
+        <div class={style.timeLimit}>
+          <div class={style.propName}>Time limit (seconds):</div>
+          <input type="number" min={1} max={600} value={state?.timeLimit?.value} onInput={onTimeLimitChange} />
+        </div>
         <div class={style.banned}>
           <div><span class={style.propName}>Banned characters</span> (JSON array):</div>
           <input class={state?.banned?.valid ? style.inputValid : style.inputInvalid} value={state?.banned?.value || ''} onInput={onBannedChange} placeholder={'[",", "+", "d"]'} />
@@ -122,6 +131,10 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
         <div class={style.description}>
           <div class={style.propName}>Description:</div>
           <input value="Short description" readonly />
+        </div>
+        <div class={style.timeLimit}>
+          <div class={style.propName}>Time limit (seconds):</div>
+          <input type="number" readonly value={180} />
         </div>
         <div class={style.banned}>
           <div class={style.propName}>Banned characters:</div>

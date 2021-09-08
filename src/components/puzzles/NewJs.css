@@ -29,6 +29,11 @@
   padding: .3em 0;
 }
 
+.timeLimit {
+  display: flex;
+  padding: .3em 0;
+}
+
 .expected {
   background: #ccc;
   padding: 1em;
