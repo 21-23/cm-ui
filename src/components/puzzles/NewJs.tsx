@@ -26,6 +26,11 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
     onChange({ ...state, description: { value: event.currentTarget.value, valid: true } });
   }
 
+  function onTimeLimitChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    const value = Number.isNaN(event.currentTarget.valueAsNumber) ? 1 : event.currentTarget.valueAsNumber;
+    onChange({ ...state, timeLimit: { value, valid: true } });
+  }
+
   function onSolutionChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>): void {
     const { value } = event.currentTarget;
 
@@ -65,6 +70,10 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
           <div class={style.propName}>Description:</div>
           <input value={state?.description?.value || ''} onInput={onDescriptionChange} />
         </div>
+        <div class={style.timeLimit}>
+          <div class={style.propName}>Time limit (seconds):</div>
+          <input type="number" min={1} max={600} value={state?.timeLimit?.value || ''} onInput={onTimeLimitChange} />
+        </div>
         <div class={style.solution}>
           <div><span class={style.propName}>Solution</span> (function body, <span class={style.highlight}>input</span> is passed as <span class={style.highlight}>arg</span> automatically):</div>
           <textarea class={state?.solution?.valid ? style.inputValid : style.inputInvalid} value={state?.solution?.value || ''} onInput={onSolutionChange} rows={5} cols={50} />
@@ -88,6 +97,10 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
         <div class={style.description}>
           <div class={style.propName}>Description:</div>
           <input value="Multiply each element of the array by 2" readonly />
+        </div>
+        <div class={style.timeLimit}>
+          <div class={style.propName}>Time limit (seconds):</div>
+          <input type="number" value={180} readonly />
         </div>
         <div class={style.solution}>
           <div class={style.propName}>Solution:</div>
