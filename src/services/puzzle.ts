@@ -1,4 +1,4 @@
-import type { GameType, NewPuzzleStateType } from '../types/types';
+import type { NewPuzzleStateType } from '../types/types';
 
 // const API_BASE_URL = `${window.location.origin}/api/`;
 const API_BASE_URL = 'http://localhost:3000/api/';

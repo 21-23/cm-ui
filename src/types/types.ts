@@ -16,3 +16,10 @@ export type NewPuzzleStateType = {
   input: NewPuzzleStatePropertyType<string, string>,
   solution: NewPuzzleStatePropertyType<string, void>,
 };
+
+export type UserType = {
+  provider: string,
+  providerId: string,
+  displayName: string,
+  uid: string,
+};
