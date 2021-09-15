@@ -15,6 +15,7 @@ export type NewPuzzleStateType = {
   banned: NewPuzzleStatePropertyType<string, void>,
   input: NewPuzzleStatePropertyType<string, string>,
   solution: NewPuzzleStatePropertyType<string, void>,
+  solutionLengthLimit: NewPuzzleStatePropertyType<number, void>,
 };
 
 export type UserType = {
