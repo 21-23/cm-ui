@@ -17,8 +17,8 @@ export async function createPuzzle(type: string, newPuzzle: NewPuzzleStateType):
       description: newPuzzle.description.value,
       timeLimit: newPuzzle.timeLimit.value,
       bannedCharacters: JSON.parse(newPuzzle.banned.value),
+      solutionLengthLimit: newPuzzle.solutionLengthLimit.value,
       // sandboxTimeLimit
-      // solutionLengthLimit
     }),
     headers: { 'Content-Type': 'application/json' },
   });
@@ -27,6 +27,6 @@ export async function createPuzzle(type: string, newPuzzle: NewPuzzleStateType):
     throw await response.json();
   }
 
-  const puzzle = await response.json();
+  const { puzzle } = await response.json();
   return puzzle.id;
 }

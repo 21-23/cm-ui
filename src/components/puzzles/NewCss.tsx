@@ -46,7 +46,8 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
   function onBannedChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
-    const { lines,  expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, state?.solution?.value, value);
+    const { lines,  expected, inputError, solutionError, bannedError, solutionLengthLimitError } =
+      validateSolution(state?.input?.value, state?.solution?.value, value, state?.solutionLengthLimit.value);
 
     setLines(lines);
     onChange({
@@ -55,13 +56,15 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
       banned: { value, valid: !bannedError, message: bannedError },
       input: { ...state?.input, valid: !inputError, message: inputError },
       solution: { ...state?.solution, valid: !solutionError, message: solutionError },
+      solutionLengthLimit: { ...state?.solutionLengthLimit, valid: !solutionLengthLimitError, message: solutionLengthLimitError },
     });
   }
 
   function onSolutionChange(event: JSX.TargetedEvent<HTMLInputElement, Event>): void {
     const { value } = event.currentTarget;
 
-    const { lines, expected, inputError, solutionError, bannedError } = validateSolution(state?.input?.value, value, state?.banned?.value);
+    const { lines, expected, inputError, solutionError, bannedError, solutionLengthLimitError } =
+      validateSolution(state?.input?.value, value, state?.banned?.value, state?.solutionLengthLimit.value);
 
     setLines(lines);
     onChange({
@@ -70,13 +73,32 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
       banned: { ...state?.banned, valid: !bannedError, message: bannedError },
       input: { ...state?.input, valid: !inputError, message: inputError },
       solution: { value, valid: !solutionError, message: solutionError },
+      solutionLengthLimit: { ...state?.solutionLengthLimit, valid: !solutionLengthLimitError, message: solutionLengthLimitError },
+    });
+  }
+
+  function onSolutionLengthLimitChange(event: JSX.TargetedEvent<HTMLInputElement, Event>) {
+    const value = Number.isNaN(event.currentTarget.valueAsNumber) ? 1 : event.currentTarget.valueAsNumber;
+
+    const { lines, expected, inputError, solutionError, bannedError, solutionLengthLimitError } =
+      validateSolution(state?.input?.value, state?.solution?.value, state?.banned?.value, value);
+
+    setLines(lines);
+    onChange({
+      ...state,
+      expected,
+      banned: { ...state?.banned, valid: !bannedError, message: bannedError },
+      input: { ...state?.input, valid: !inputError, message: inputError },
+      solution: { ...state?.solution, valid: !solutionError, message: solutionError },
+      solutionLengthLimit: { value, valid: !solutionLengthLimitError, message: solutionLengthLimitError },
     });
   }
 
   function onInputChange(event: JSX.TargetedEvent<HTMLTextAreaElement, Event>): void {
     const { value } = event.currentTarget;
 
-    const { lines, internalInput, expected, inputError, solutionError, bannedError } = validateSolution(value, state?.solution?.value, state?.banned?.value);
+    const { lines, internalInput, expected, inputError, solutionError, bannedError, solutionLengthLimitError } =
+      validateSolution(value, state?.solution?.value, state?.banned?.value, state?.solutionLengthLimit.value);
 
     setLines(lines);
     onChange({
@@ -85,6 +107,7 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
       banned: { ...state?.banned, valid: !bannedError, message: bannedError },
       input: { value, internal: internalInput, valid: !inputError, message: inputError },
       solution: { ...state?.solution, valid: !solutionError, message: solutionError },
+      solutionLengthLimit: { ...state?.solutionLengthLimit, valid: !solutionLengthLimitError, message: solutionLengthLimitError },
     });
   }
 
@@ -115,6 +138,11 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
           <input class={state?.solution?.valid ? style.inputValid : style.inputInvalid} value={state?.solution?.value || ''} onInput={onSolutionChange} />
           {state?.solution?.message && <div class={style.errorMessage}>{state?.solution?.message}</div>}
         </div>
+        <div class={style.solutionLengthLimit}>
+          <div class={style.propName}>Solution length limit (amount of characters):</div>
+          <input type="number" min={-1} value={state?.solutionLengthLimit?.value} onInput={onSolutionLengthLimitChange} />
+          {state?.solutionLengthLimit?.message && <div class={style.errorMessage}>{state?.solutionLengthLimit?.message}</div>}
+        </div>
         <div class={style.input}>
           <div class={style.propName}>Input:</div>
           <textarea class={state?.input?.valid ? style.inputValid : style.inputInvalid} value={state?.input?.value || ''} onInput={onInputChange} rows={5} cols={50} />
@@ -144,6 +172,10 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
           <div class={style.propName}>Solution:</div>
           <input value=".spcl" readonly />
         </div>
+        <div class={style.solutionLengthLimit}>
+          <div class={style.propName}>Solution length limit (amount of characters):</div>
+          <input type="number" readonly value={50} />
+        </div>
         <div class={style.input}>
           <div class={style.propName}>Input:</div>
           <textarea value={'<div><span class="spcl">content</span></div>'} readonly rows={5} cols={50} />
@@ -155,12 +187,14 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
 
 export default NewCss;
 
-function validateSolution(inputValue: string, solutionValue: string, bannedValue: string): { internalInput: string, lines: Line[], expected: string, inputError: string, solutionError: string, bannedError: string } {
+function validateSolution(inputValue: string, solutionValue: string, bannedValue: string, solutionLengthLimitValue: number):
+  { internalInput: string, lines: Line[], expected: string, inputError: string, solutionError: string, bannedError: string, solutionLengthLimitError: string } {
   const { input, inputError } = parseInput(inputValue);
   const parsedSolution = parseSolution(solutionValue);
   let solutionError = parsedSolution.solutionError;
   const solution = parsedSolution.solution;
   const { banned, bannedError } = parseBanned(bannedValue);
+  const { solutionLengthLimit, solutionLengthLimitError } = parseSolutionLengthLimit(solutionLengthLimitValue);
   let lines: Line[] = [];
   let expected: string[] = [];
   let internalInput = '';
@@ -172,6 +206,13 @@ function validateSolution(inputValue: string, solutionValue: string, bannedValue
     const chars = banned.map((char) => char.replace(escapeSymbolsRegex, '\\$&')).join('|');
     if (new RegExp(`(${chars})`, 'i').test(solution)) {
       solutionError = 'Solution can not contain banned characters';
+    }
+  }
+
+  // check solution length limitation
+  if (!solutionError && !solutionLengthLimitError) {
+    if (solutionLengthLimit !== -1 && solution.length > solutionLengthLimit) {
+      solutionError = 'Solution can not be longer than limit';
     }
   }
 
@@ -202,7 +243,7 @@ function validateSolution(inputValue: string, solutionValue: string, bannedValue
     }
   }
 
-  return { internalInput, lines, expected: JSON.stringify(expected), inputError, solutionError, bannedError };
+  return { internalInput, lines, expected: JSON.stringify(expected), inputError, solutionError, bannedError, solutionLengthLimitError };
 }
 
 function parseInput(inputValue: string): { input: string, inputError: string } {
@@ -235,6 +276,18 @@ function parseBanned(bannedValue: string): { banned: string[], bannedError: stri
     console.log('Failed to parse `Banned characters`', error);
     return { banned: [], bannedError: 'Invalid JSON. Example: [".", "#", "d"]' };
   }
+}
+
+function parseSolutionLengthLimit(solutionLengthLimitValue: number): { solutionLengthLimit: number, solutionLengthLimitError: string } {
+  if (!Number.isFinite(solutionLengthLimitValue)) {
+    return { solutionLengthLimit: -1, solutionLengthLimitError: 'Wrong value' };
+  }
+
+  if (solutionLengthLimitValue < -1 || solutionLengthLimitValue === 0) {
+    return { solutionLengthLimit: -1, solutionLengthLimitError: 'Should be a positive integer or -1' };
+  }
+
+  return { solutionLengthLimit: solutionLengthLimitValue, solutionLengthLimitError: '' };
 }
 
 type MarkupRendererPropsType = {

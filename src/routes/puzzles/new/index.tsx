@@ -51,27 +51,31 @@ const NewPuzzle: FunctionalComponent = () => {
       banned: { value: JSON.stringify([]), valid: true },
       input: { value: '', internal: '', valid: false },
       solution: { value: '', valid: false },
+      solutionLengthLimit: { value: -1, valid: true },
     },
     JS: {
       name: { value: '', valid: false },
       description: { value: '', valid: true },
       timeLimit: { value: 180, valid: true },
       expected: '',
-      banned: { value: '', valid: false },
+      banned: { value: JSON.stringify([]), valid: true },
       input: { value: '', valid: false },
       solution: { value: '', valid: false },
+      solutionLengthLimit: { value: -1, valid: true },
     },
     Lodash: {
       name: { value: '', valid: false },
       description: { value: '', valid: true },
       timeLimit: { value: 180, valid: true },
       expected: '',
-      banned: { value: '', valid: false },
+      banned: { value: JSON.stringify([]), valid: true },
       input: { value: '', valid: false },
       solution: { value: '', valid: false },
+      solutionLengthLimit: { value: -1, valid: true },
     },
   });
   const [actionState, setActionState] = useState<ActionStateType>('IDLE');
+  const [puzzleId, setPuzzleId] = useState<string>('');
 
   async function createPuzzleClick() {
     const puzzleState = newPuzzle[game];
@@ -93,7 +97,9 @@ const NewPuzzle: FunctionalComponent = () => {
     setActionState('IN_PROGRESS');
 
     try {
-      await createPuzzle(Game[game], puzzleState);
+      const newPuzzleId = await createPuzzle(Game[game], puzzleState);
+      alert('Puzzle created!');
+      setPuzzleId(newPuzzleId);
     } catch (error) {
       alert(JSON.stringify(error));
     } finally {
@@ -108,8 +114,11 @@ const NewPuzzle: FunctionalComponent = () => {
       </div>
       <div class={style.actions}>
         <button className="-positive -bigger" onClick={createPuzzleClick}>Create</button>
-        <button className="-bigger" onClick={() => route('/puzzles/new/hidden')}>Add hidden test</button>
+        <button className="-bigger" onClick={() => route(`/puzzles/new/hidden?puzzleId=${puzzleId}`)}>Add hidden test</button>
       </div>
+      {puzzleId && <div class={style.createdPuzzle}>
+        Newly created puzzle id:{puzzleId}
+      </div>}
       <GameSelector selected={game} onChange={(game) => setGame(game)} />
       {game === 'CSS' && <NewCss state={newPuzzle.CSS} onChange={(CSS) => setNewPuzzle({ ...newPuzzle, CSS })} />}
       {game === 'JS' && <NewJs state={newPuzzle.JS} onChange={(JS) => setNewPuzzle({ ...newPuzzle, JS })} />}

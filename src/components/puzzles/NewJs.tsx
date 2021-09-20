@@ -52,7 +52,7 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
     return onChange({
       ...state,
       expected,
-      input: { value, valid: !inputError, message: inputError },
+      input: { value, internal: value, valid: !inputError, message: inputError },
       solution: { ...state?.solution, valid: !solutionError, message: solutionError },
     });
   }
