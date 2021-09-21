@@ -106,23 +106,3 @@ const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle }) => {
 };
 
 export default Puzzle;
-
-// id: string,
-// type: GameTypeType,
-// name: string,
-// description?: string | null,
-// solution: string,
-// author: {
-//     id: string,
-//     name: string,
-// },
-// tests: {
-//   default: PuzzleTestType,
-//   hidden: PuzzleTestType[],
-// },
-// constraints: {
-//     timeLimit: number,
-//     bannedCharacters: string[],
-//     sandboxTimeLimit: number,
-//     solutionLengthLimit: number | null,
-// },
