@@ -1,4 +1,5 @@
 export type GameType = 'CSS' | 'JS' | 'Lodash';
+export type GameTypeType = 'cssqd' | 'jsqd' | '_qd';
 
 type NewPuzzleStatePropertyType<ValueT, InternalT> = {
   value: ValueT,
@@ -23,4 +24,32 @@ export type UserType = {
   providerId: string,
   displayName: string,
   uid: string,
+};
+
+export type PuzzleTestType = {
+  id: string,
+  input: string,
+  expected: string,
+};
+
+export type FullPuzzleType = {
+  id: string,
+  type: GameTypeType,
+  name: string,
+  description?: string | null,
+  solution: string,
+  author: {
+      id: string,
+      name: string,
+  },
+  tests: {
+    default: PuzzleTestType,
+    hidden: PuzzleTestType[],
+  },
+  constraints: {
+      timeLimit: number,
+      bannedCharacters: string[],
+      sandboxTimeLimit: number,
+      solutionLengthLimit: number | null,
+  },
 };
