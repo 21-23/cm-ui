@@ -1,7 +1,7 @@
 import type { UserType } from '../types/types';
 
-// const API_BASE_URL = `${window.location.origin}/api/`;
-const API_BASE_URL = 'http://localhost:3000/api/';
+const API_BASE_URL = `${window.location.origin}/api/`;
+// const API_BASE_URL = 'http://localhost:3000/api/';
 
 export async function fetchUser(): Promise<UserType> {
   const url = new URL('v1/getUser', API_BASE_URL);
