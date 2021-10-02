@@ -1,0 +1,98 @@
+.puzzle {
+
+}
+
+.puzzleMeta {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #333;
+}
+
+.propName {
+  font-weight: bold;
+}
+
+.id {
+  display: flex;
+  padding: .3em 0;
+  margin: 0 .5em;
+}
+.type {
+  display: flex;
+  padding: .3em 0;
+  margin: 0 .5em;
+}
+.name {
+  display: flex;
+  padding: .3em 0;
+  margin: 0 .5em;
+}
+.description {
+  display: flex;
+  padding: .3em 0;
+  margin: 0 .5em;
+}
+.solution {
+  display: flex;
+  padding: .3em 0;
+}
+.authorId {
+  display: flex;
+  padding: .3em 0;
+  margin: 0 .5em;
+}
+.authorName {
+  display: flex;
+  padding: .3em 0;
+  margin: 0 .5em;
+}
+.constraints {
+  padding: .5em;
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #333;
+  justify-content: space-evenly;
+}
+.timeLimit {
+  display: flex;
+  padding: .3em 0;
+}
+.bannedCharacters {
+  display: flex;
+  padding: .3em 0;
+}
+.solutionLengthLimit {
+  display: flex;
+  padding: .3em 0;
+}
+.execution {
+  display: flex;
+}
+.defaultTest {
+  padding: .5em;
+}
+.defaultTestTitle {
+  font-weight: bold;
+}
+.defaultTestId {
+  display: flex;
+  padding: .3em 0;
+}
+.defaultTestExpected {
+  display: flex;
+  padding: .3em 0;
+}
+.test {
+  padding: .5em;
+}
+.testTitle {
+  font-weight: bold;
+}
+.testId {
+  display: flex;
+  padding: .3em 0;
+}
+.testExpected {
+  display: flex;
+  padding: .3em 0;
+}

@@ -14,7 +14,7 @@ const Puzzles: FunctionalComponent = () => {
       <Router>
         <Route path="/puzzles" component={PuzzleList} />
         <Route path="/puzzles/new" component={NewPuzzle} />
-        <Route path="/puzzles/new/hidden" component={NewHiddenTest} />
+        <Route path="/puzzles/new/hidden/:puzzleId?" component={NewHiddenTest} />
       </Router>
     </div>
   );

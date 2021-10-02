@@ -5,14 +5,14 @@ import { route } from 'preact-router';
 import { useState } from "preact/hooks";
 
 import style from './style.css';
-import type { GameType, NewPuzzleStateType } from '../../../types/types';
+import type { GameType, GameTypeType, NewPuzzleStateType } from '../../../types/types';
 import { createPuzzle } from '../../../services/puzzle';
 
 import NewCss from '../../../components/puzzles/NewCss';
 import NewJs from '../../../components/puzzles/NewJs';
 import NewLodash from '../../../components/puzzles/NewLodash';
 
-const Game: { [key in GameType]: string } = {
+const Game: { [key in GameType]: GameTypeType } = {
   CSS: 'cssqd',
   JS: 'jsqd',
   Lodash: '_qd',
@@ -114,7 +114,7 @@ const NewPuzzle: FunctionalComponent = () => {
       </div>
       <div class={style.actions}>
         <button className="-positive -bigger" onClick={createPuzzleClick}>Create</button>
-        <button className="-bigger" onClick={() => route(`/puzzles/new/hidden?puzzleId=${puzzleId}`)}>Add hidden test</button>
+        <button className="-bigger" onClick={() => route(`/puzzles/new/hidden/${puzzleId}`)}>Add hidden test</button>
       </div>
       {puzzleId && <div class={style.createdPuzzle}>
         Newly created puzzle id:{puzzleId}

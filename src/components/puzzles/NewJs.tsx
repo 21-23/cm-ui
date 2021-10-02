@@ -117,7 +117,7 @@ const NewJs: FunctionalComponent<NewJsPropsType> = ({ state, onChange }) => {
 
 export default NewJs;
 
-function applySolution(inputValue?: string, solution?: string): { expected: string, inputError: string, solutionError: string } {
+export function applySolution(inputValue?: string, solution?: string): { expected: string, inputError: string, solutionError: string } {
   const expected = '';
   const inputError = '';
   const solutionError = '';

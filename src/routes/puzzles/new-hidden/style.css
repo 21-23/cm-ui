@@ -1,0 +1,42 @@
+/* YOLO: on */
+
+.title {
+  font-size: 2em;
+  padding: .5em;
+}
+
+.puzzleSelector {
+  display: flex;
+  padding: 1em .5em;
+}
+.puzzleIdInputLabel {
+  font-size: 1.3em;
+}
+.puzzleIdInput {
+  min-width: 300px;
+}
+.inputs {
+  border-top: 2px solid #333;
+}
+.inputsTitle {
+  font-size: 2em;
+}
+.errorMessage {
+  color: #9b1d1d;
+  font-size: 80%;
+}
+.propName {
+  font-weight: bold;
+}
+.inputValid {
+  border-color: #177317;
+}
+.inputInvalid {
+  border-color: #9b1d1d;
+  background: #fde4e4;
+}
+
+.jsExpected {
+  background: #ccc;
+  padding: 1em;
+}

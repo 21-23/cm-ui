@@ -7,7 +7,7 @@ import type { NewPuzzleStateType } from '../../types/types';
 
 import style from './NewCss.css';
 
-type Line = {
+export type Line = {
   qdId: string,
   tagName: string,
   tagValue: string | null,
@@ -151,7 +151,7 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
         </div>
       </div>
       <div class={style.examples}>
-      <div class={style.title}>Example</div>
+        <div class={style.title}>Example</div>
         <div class={style.name}>
           <div class={style.propName}>Name:</div>
           <input value="Puzzle name" readonly />
@@ -187,7 +187,7 @@ const NewCss: FunctionalComponent<NewCssPropsType> = ({ state, onChange }) => {
 
 export default NewCss;
 
-function validateSolution(inputValue: string, solutionValue: string, bannedValue: string, solutionLengthLimitValue: number):
+export function validateSolution(inputValue: string, solutionValue: string, bannedValue: string, solutionLengthLimitValue: number):
   { internalInput: string, lines: Line[], expected: string, inputError: string, solutionError: string, bannedError: string, solutionLengthLimitError: string } {
   const { input, inputError } = parseInput(inputValue);
   const parsedSolution = parseSolution(solutionValue);
@@ -294,7 +294,7 @@ type MarkupRendererPropsType = {
   lines: Line[],
   expected: string,
 };
-const MarkupRenderer: FunctionalComponent<MarkupRendererPropsType> = ({ lines, expected }) => {
+export const MarkupRenderer: FunctionalComponent<MarkupRendererPropsType> = ({ lines, expected }) => {
   let arrayOfExpected: string[] = [];
   try {
     if (expected) {
