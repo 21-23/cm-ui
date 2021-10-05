@@ -11,6 +11,7 @@ import Header from './header';
 // Code-splitting is automated for `routes` directory
 import Home from '../routes/home';
 import Puzzles from '../routes/puzzles';
+import Sets from '../routes/sets';
 import Sessions from '../routes/sessions';
 
 const App: FunctionalComponent = () => {
@@ -25,6 +26,7 @@ const App: FunctionalComponent = () => {
         <Router history={history}>
           <Route path="/" component={Home} />
           <Route path="/puzzles/:rest*" component={Puzzles} />
+          <Route path="/sets/:rest*" component={Sets} />
           <Route path="/sessions" component={Sessions} />
         </Router>
       </IdentityProvider>
