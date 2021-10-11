@@ -21,7 +21,7 @@ export type NewPuzzleStateType = {
 
 export type NewSetStateType = {
   name: string,
-  order: string[],
+  order: FullPuzzleType[],
 };
 
 export type UserType = {
