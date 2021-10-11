@@ -11,3 +11,7 @@ export const Whitespace: FunctionalComponent<WhitespacePropsType> = ({ width, he
 export const Whitespace16: FunctionalComponent = () => {
   return <Whitespace width="16px" height="0px" />
 }
+
+export const Whitespace8: FunctionalComponent = () => {
+  return <Whitespace width="8px" height="0px" />
+}

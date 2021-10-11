@@ -58,3 +58,9 @@ export type FullPuzzleType = {
       solutionLengthLimit: number | null,
   },
 };
+
+export type FullSetType = {
+  id: string,
+  name: string,
+  order: FullPuzzleType[],
+};
