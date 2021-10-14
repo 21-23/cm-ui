@@ -1,23 +1,55 @@
 // YOLO: on
 
-import { FunctionalComponent, h, JSX } from 'preact';
+import { FunctionalComponent, h } from 'preact';
+import { useState } from 'preact/hooks';
 
 import type { FullPuzzleType } from '../../types/types';
+import { Whitespace8, Whitespace16 } from '../Whitespace';
+import useHistory from '../../hooks/useHistory';
 
 import style from './Puzzle.css';
 
 type PuzzlePropsType = {
   puzzle: FullPuzzleType | null,
+  collapsed?: boolean,
 };
 
-const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle }) => {
+const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle, collapsed }) => {
+  const [short, setShort] = useState<boolean>(collapsed === true);
+  const history = useHistory();
+
+  function onPreviewClick() {
+    if (!puzzle) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    url.hash = history.createHref(`/puzzles/${puzzle.id}`);
+    window.open(url, puzzle.id, 'width=700,height=500');
+  }
+
   if (!puzzle) {
     return null;
+  }
+
+  if (short) {
+    return (
+      <div class={style.shortPuzzle}>
+        <div class={style.shortTitle}>[{puzzle.type}] {puzzle.name}</div>
+        <div class={style.actions}>
+          <Whitespace16 />
+          <button class="-smaller" title="Preview puzzle" onClick={onPreviewClick}>👁</button>
+          <Whitespace8 />
+          <button class="-smaller" title="Expand" onClick={() => { setShort(false); }}>+</button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div class={style.puzzle}>
       <div class={style.puzzleMeta}>
+        <button class="-smaller" title="Preview puzzle" onClick={onPreviewClick}>👁</button>
         <div class={style.id}>
           <div class={style.propName}>Id:</div>
           <input value={puzzle.id} readonly disabled />

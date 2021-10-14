@@ -1,7 +1,7 @@
-import type { FullPuzzleType, NewPuzzleStateType } from '../types/types';
+import type { FullPuzzleType, NewPuzzleStateType, GameTypeType } from '../types/types';
 
-const API_BASE_URL = `${window.location.origin}/api/`;
-// const API_BASE_URL = 'http://localhost:3000/api/';
+// const API_BASE_URL = `${window.location.origin}/api/`;
+const API_BASE_URL = 'http://localhost:3000/api/';
 
 export async function createPuzzle(type: string, newPuzzle: NewPuzzleStateType): Promise<string> {
   const url = new URL('v1/createPuzzle', API_BASE_URL);
@@ -63,4 +63,26 @@ export async function fetchPuzzle(puzzleId: string): Promise<FullPuzzleType> {
 
   const { puzzle } = await response.json();
   return puzzle;
+}
+
+type ListOwnOptionsType = {
+  game: GameTypeType,
+};
+export async function listOwnPuzzles(options: ListOwnOptionsType): Promise<FullPuzzleType[]> {
+  const url = new URL('v1/listOwnPuzzles', API_BASE_URL);
+  Object.entries(options).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw await response.json();
+  }
+
+  const { puzzles } = await response.json();
+  return puzzles;
 }

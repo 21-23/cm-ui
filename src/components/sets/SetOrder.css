@@ -1,0 +1,23 @@
+/* YOLO: on */
+
+.root {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.column {
+  flex-grow: 1;
+  max-width: 35%;
+}
+.columTitle {
+  text-align: center;
+}
+
+.items {
+  padding: .5em;
+  overflow-y: scroll;
+  height: 60vh;
+}
+.items > *:nth-child(2n + 1) {
+  background: #eee;
+}

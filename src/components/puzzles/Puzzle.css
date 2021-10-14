@@ -1,6 +1,9 @@
 .puzzle {
 
 }
+.shortPuzzle {
+
+}
 
 .puzzleMeta {
   display: flex;
@@ -95,4 +98,10 @@
 .testExpected {
   display: flex;
   padding: .3em 0;
+}
+
+.actions {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
 }

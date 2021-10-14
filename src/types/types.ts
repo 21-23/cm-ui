@@ -19,6 +19,11 @@ export type NewPuzzleStateType = {
   solutionLengthLimit: NewPuzzleStatePropertyType<number, void>,
 };
 
+export type NewSetStateType = {
+  name: string,
+  order: FullPuzzleType[],
+};
+
 export type UserType = {
   provider: string,
   providerId: string,
@@ -52,4 +57,10 @@ export type FullPuzzleType = {
       sandboxTimeLimit: number,
       solutionLengthLimit: number | null,
   },
+};
+
+export type FullSetType = {
+  id: string,
+  name: string,
+  order: FullPuzzleType[],
 };

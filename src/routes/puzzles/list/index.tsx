@@ -9,6 +9,7 @@ const PuzzleList: FunctionalComponent = () => {
     <div>
       PUZZLES
       <button onClick={() => route('/puzzles/new')}>NEW</button>
+      <button onClick={() => route('/puzzles/new/hidden')}>NEW HIDDEN TEST</button>
     </div>
   );
 }

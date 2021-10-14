@@ -1,0 +1,18 @@
+/* YOLO: on */
+
+.root {
+  padding: .5em;
+  display: flex;
+  align-items: center;
+}
+
+.handle {
+  cursor: move;
+  cursor: -webkit-grabbing;
+}
+
+.actions {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}

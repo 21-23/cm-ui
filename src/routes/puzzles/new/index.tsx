@@ -6,39 +6,15 @@ import { useState } from "preact/hooks";
 
 import style from './style.css';
 import type { GameType, GameTypeType, NewPuzzleStateType } from '../../../types/types';
+import { Game } from '../../../constants/constants';
 import { createPuzzle } from '../../../services/puzzle';
 
+import GameSelector from '../../../components/game-selector';
 import NewCss from '../../../components/puzzles/NewCss';
 import NewJs from '../../../components/puzzles/NewJs';
 import NewLodash from '../../../components/puzzles/NewLodash';
 
-const Game: { [key in GameType]: GameTypeType } = {
-  CSS: 'cssqd',
-  JS: 'jsqd',
-  Lodash: '_qd',
-};
-
-const GAMES: GameType[] = Object.keys(Game) as GameType[];
-
 export type ActionStateType = 'IDLE' | 'IN_PROGRESS';
-
-type GameSelectorPropsType = {
-  selected: GameType,
-  onChange: (game: GameType) => void,
-};
-const GameSelector: FunctionalComponent<GameSelectorPropsType> = ({ selected, onChange }) => {
-  return (
-    <div class={style.gameSelector}>
-      {GAMES.map((game) => {
-        const className = game === selected ? '-active' : '';
-
-        return <button key={game} className={className} onClick={() => onChange(game)}>{game}</button>
-      })}
-    </div>
-  );
-}
-
-
 
 const NewPuzzle: FunctionalComponent = () => {
   const [game, setGame] = useState<GameType>('CSS');
