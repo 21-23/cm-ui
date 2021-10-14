@@ -28,6 +28,16 @@ const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle, collapsed }) => 
     window.open(url, puzzle.id, 'width=700,height=500');
   }
 
+  function onAddHiddenClick() {
+    if (!puzzle) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    url.hash = history.createHref(`/puzzles/new/hidden/${puzzle.id}`);
+    window.open(url, puzzle.id, 'width=700,height=500');
+  }
+
   if (!puzzle) {
     return null;
   }
@@ -40,6 +50,8 @@ const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle, collapsed }) => 
           <Whitespace16 />
           <button class="-smaller" title="Preview puzzle" onClick={onPreviewClick}>👁</button>
           <Whitespace8 />
+          <button class="-smaller" title="Add hidden test" onClick={onAddHiddenClick}>🙈</button>
+          <Whitespace8 />
           <button class="-smaller" title="Expand" onClick={() => { setShort(false); }}>+</button>
         </div>
       </div>
@@ -50,6 +62,7 @@ const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle, collapsed }) => 
     <div class={style.puzzle}>
       <div class={style.puzzleMeta}>
         <button class="-smaller" title="Preview puzzle" onClick={onPreviewClick}>👁</button>
+        <button class="-smaller" title="Collapse" onClick={() => { setShort(true); }}>-</button>
         <div class={style.id}>
           <div class={style.propName}>Id:</div>
           <input value={puzzle.id} readonly disabled />
