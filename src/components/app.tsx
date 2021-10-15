@@ -27,7 +27,7 @@ const App: FunctionalComponent = () => {
           <Route path="/" component={Home} />
           <Route path="/puzzles/:rest*" component={Puzzles} />
           <Route path="/sets/:rest*" component={Sets} />
-          <Route path="/sessions" component={Sessions} />
+          <Route path="/sessions/:rest*" component={Sessions} />
         </Router>
       </IdentityProvider>
     </div>

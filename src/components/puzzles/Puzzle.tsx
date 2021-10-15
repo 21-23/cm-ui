@@ -35,7 +35,7 @@ const Puzzle: FunctionalComponent<PuzzlePropsType> = ({ puzzle, collapsed }) => 
 
     const url = new URL(window.location.href);
     url.hash = history.createHref(`/puzzles/new/hidden/${puzzle.id}`);
-    window.open(url, puzzle.id, 'width=700,height=500');
+    window.open(url, puzzle.id);
   }
 
   if (!puzzle) {
