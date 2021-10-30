@@ -1,4 +1,4 @@
-import type { FullSetType, NewSetStateType } from '../types/types';
+import type { FullSetType, NewSetStateType, GameTypeType } from '../types/types';
 
 // const API_BASE_URL = `${window.location.origin}/api/`;
 const API_BASE_URL = 'http://localhost:3000/api/';
@@ -38,4 +38,21 @@ export async function fetchFullSet(setId: string): Promise<FullSetType> {
 
   const { puzzleSet } = await response.json();
   return puzzleSet;
+}
+
+type ListOwnSetsOptionsType = {};
+export async function listOwnSets(options: ListOwnSetsOptionsType): Promise<FullSetType[]> {
+  const url = new URL('v1/listOwnSets', API_BASE_URL);
+
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw await response.json();
+  }
+
+  const { puzzleSets } = await response.json();
+  return puzzleSets;
 }

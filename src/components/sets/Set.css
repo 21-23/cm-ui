@@ -25,3 +25,12 @@
   padding: .3em 0;
   margin: 0 .5em;
 }
+
+.shortSet {
+
+}
+.actions {
+  display: flex;
+  flex-grow: 1;
+  justify-content: flex-end;
+}

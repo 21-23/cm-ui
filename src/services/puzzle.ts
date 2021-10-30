@@ -65,10 +65,10 @@ export async function fetchPuzzle(puzzleId: string): Promise<FullPuzzleType> {
   return puzzle;
 }
 
-type ListOwnOptionsType = {
+type ListOwnPuzzlesOptionsType = {
   game: GameTypeType,
 };
-export async function listOwnPuzzles(options: ListOwnOptionsType): Promise<FullPuzzleType[]> {
+export async function listOwnPuzzles(options: ListOwnPuzzlesOptionsType): Promise<FullPuzzleType[]> {
   const url = new URL('v1/listOwnPuzzles', API_BASE_URL);
   Object.entries(options).forEach(([key, value]) => {
     url.searchParams.set(key, value);

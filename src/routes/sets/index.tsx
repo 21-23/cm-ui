@@ -9,13 +9,11 @@ import SetDetails from './details'
 
 const Sets: FunctionalComponent = () => {
   return (
-    <div>
-      <Router>
-        <Route path="/sets" component={SetsList} />
-        <Route path="/sets/new" component={NewSet} />
-        <Route path="/sets/:setId" component={SetDetails} />
-      </Router>
-    </div>
+    <Router>
+      <Route path="/sets" component={SetsList} />
+      <Route path="/sets/new" component={NewSet} />
+      <Route path="/sets/:setId" component={SetDetails} />
+    </Router>
   );
 }
 
