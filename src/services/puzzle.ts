@@ -1,7 +1,7 @@
 import type { FullPuzzleType, NewPuzzleStateType, GameTypeType } from '../types/types';
 
-// const API_BASE_URL = `${window.location.origin}/api/`;
-const API_BASE_URL = 'http://localhost:3000/api/';
+const API_BASE_URL = `${window.location.origin}/api/`;
+// const API_BASE_URL = 'http://localhost:3000/api/';
 
 export async function createPuzzle(type: string, newPuzzle: NewPuzzleStateType): Promise<string> {
   const url = new URL('v1/createPuzzle', API_BASE_URL);
