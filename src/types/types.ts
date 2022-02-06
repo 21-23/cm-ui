@@ -1,7 +1,7 @@
 export type GameType = 'CSS' | 'JS' | 'Lodash';
 export type GameTypeType = 'cssqd' | 'jsqd' | '_qd';
 
-type NewPuzzleStatePropertyType<ValueT, InternalT> = {
+type ValidityStatePropertyType<ValueT, InternalT> = {
   value: ValueT,
   internal?: InternalT | null,
   valid: boolean,
@@ -9,19 +9,27 @@ type NewPuzzleStatePropertyType<ValueT, InternalT> = {
 }
 
 export type NewPuzzleStateType = {
-  name: NewPuzzleStatePropertyType<string, void>,
-  description: NewPuzzleStatePropertyType<string, void>,
-  timeLimit: NewPuzzleStatePropertyType<number, void>,
+  name: ValidityStatePropertyType<string, void>,
+  description: ValidityStatePropertyType<string, void>,
+  timeLimit: ValidityStatePropertyType<number, void>,
   expected: string,
-  banned: NewPuzzleStatePropertyType<string, void>,
-  input: NewPuzzleStatePropertyType<string, string>,
-  solution: NewPuzzleStatePropertyType<string, void>,
-  solutionLengthLimit: NewPuzzleStatePropertyType<number, void>,
+  banned: ValidityStatePropertyType<string, void>,
+  input: ValidityStatePropertyType<string, string>,
+  solution: ValidityStatePropertyType<string, void>,
+  solutionLengthLimit: ValidityStatePropertyType<number, void>,
 };
 
 export type NewSetStateType = {
   name: string,
   order: FullPuzzleType[],
+};
+
+export type NewSessionStateType = {
+  setId: string,
+  name: ValidityStatePropertyType<string, void>,
+  alias: ValidityStatePropertyType<string, void>,
+  date: ValidityStatePropertyType<Date, string>,
+  participantLimit?: ValidityStatePropertyType<number, void>,
 };
 
 export type UserType = {

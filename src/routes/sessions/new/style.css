@@ -10,5 +10,32 @@
 }
 
 .inputs {
-  padding: .5em 0;
+  padding: .5em;
+}
+.inputValid {
+  border-color: #177317;
+}
+.inputInvalid {
+  border-color: #9b1d1d;
+  background: #fde4e4;
+}
+.errorMessage {
+  color: #9b1d1d;
+  font-size: 80%;
+}
+.propName {
+  font-weight: bold;
+}
+.setId {
+  display: flex;
+}
+.name {
+  display: flex;
+}
+.alias {
+  display: flex;
+}
+
+.setContainerHeading {
+  font-size: 1.2rem;
 }
